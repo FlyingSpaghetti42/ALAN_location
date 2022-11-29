@@ -6,22 +6,39 @@ import folium
 import streamlit_folium as st_folium
 from data_.data import cleaning
 
+##############################################################################
+######### Map Layout #########################################################
+##############################################################################
+
+#defining the map layout:
+st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':sheep:')
 
 
+##############################################################################
+######### Data to be used ####################################################
+##############################################################################
 
-st.set_page_config(layout="wide")
-#creating a dictionary to get different colors per amenity:
+#Street, the user wants to search for:
+'info_input = Here, the function for the query has to stand'
 
-
-# calling the cleaning function to get our data in the interface frame:
+#getting the data: (PLACEHOLDER)
 info_input = cleaning()
 
-#defining the options, the user is able to choose amenities from:
-amenities = list(info_input.amenity.unique())
+#Amenities, he can  search for:
+classes = list(info_input.amenity.unique())
 
+##############################################################################
+######### Query Input ########################################################
+##############################################################################
+
+#Input params:
+radius = st.slider('Radius',100,5000,1000,50)
 #Selector on the webiste:
-option = st.multiselect('Select amenit:', amenities)
-st.write(option)
+option = st.multiselect('Select amenit:', classes)
+
+##############################################################################
+### Data Cleaning Step 2 - Classes ###########################################
+##############################################################################
 
 #creating a checklist for our dataframe (only the amenities in this list will be kept in our DF):
 checks = []
@@ -35,8 +52,28 @@ color = {
          'restaurant': 'blue'
          }
 
+
 #defining the data to be displayed:
-display_data = info_input[info_input['amenity'].isin(checks)].reset_index()
+class_data = info_input[info_input['amenity'].isin(checks)].reset_index()
+
+##############################################################################
+## Data Cleaning Step 2 - Subclasses #########################################
+##############################################################################
+
+
+subclass = list(class_data.id.unique())
+options = st.multiselect('Select amenit:', subclass)
+
+checks_subclass = []
+for i in range(len(options)):
+    checks_subclass.append(options[i])
+
+display_data = class_data[class_data['id'].isin(checks_subclass)].reset_index()
+
+
+##############################################################################
+################### Displaying Data  #########################################
+##############################################################################
 
 
 #initilaizing our map
@@ -51,12 +88,10 @@ for i in range(len(display_data)):
                 icon = folium.Icon(color = color[display_data["amenity"][i]],
                                     icon = 'info-sign')).add_to(map)
 
-
-
 #creating a radius:
 folium.Circle(
     location=[info_input.lat.mean(),info_input.lon.mean()],
-    radius=2000,
+    radius=radius,
     popup="Laurelhurst Park",
     color="#3186cc",
     fill=True,
@@ -66,3 +101,6 @@ folium.Circle(
 
 #displaying the map:
 st_folium.folium_static(map, width = 1600, height = 1000)
+
+
+st.dataframe(display_data, width = 1600)
