@@ -1,0 +1,119 @@
+,@id,amenity,name,@lat,@lon,contact:phone,contact:website,addr:city,addr:street
+0,86001794,restaurant,Bocca di Bacco,52.5151154,13.3889505,+49 30 206 72828,http://www.boccadibacco.de/,Berlin,Friedrichstraße
+1,86001798,restaurant,Restaurant Borchardt,52.5150034,13.3903882,+49 30 81886262,,Berlin,Französische Straße
+2,86001800,restaurant,Charlotte & Fritz,52.5150373,13.3907724,,https://charlotteundfritz.com/,Berlin,Charlottenstraße
+3,86001813,restaurant,Aigner,52.514689,13.3909281,,,Berlin,Französische Straße
+4,86001825,bar,Lutter & Wegner,52.5132123,13.3911782,,,Berlin,Charlottenstraße
+5,86001833,restaurant,Malatesta,52.5124049,13.3913074,,,Berlin,Charlottenstraße
+6,86001837,restaurant,Fellini,52.5120539,13.3922763,,,,
+7,86001846,bar,Shan's Bistro,52.5130816,13.3935532,,,,
+8,87040391,restaurant,Maximilians,52.5113441,13.3891811,+49 30 20450559,https://www.maximilians-berlin.de/,Berlin,Friedrichstraße
+9,87040394,bar,Izumi Sushi Bar,52.511292,13.3887116,,,Berlin,Kronenstraße
+10,380498020,restaurant,Kubrat,52.5100835,13.389129,,http://www.hotel-kubrat.de/,Berlin,Leipziger Straße
+11,531282072,restaurant,Morélos,52.5041463,13.3812523,,,Berlin,Askanischer Platz
+12,531283073,restaurant,Veli's Restaurant,52.5055987,13.3805743,,,Berlin,Stresemannstraße
+13,531323963,restaurant,Stadtklause,52.5047492,13.3806625,+49 3051056381,,Berlin,Bernburger Straße
+14,531325548,restaurant,Osteria Caruso,52.506311,13.3770107,,,Berlin,Köthener Straße
+15,619526701,restaurant,Erdinger am Gendarmenmarkt,52.5142926,13.3933731,,,Berlin,Jägerstraße
+16,619526702,restaurant,Goodtime,52.51271,13.397045,,,Berlin,Hausvogteiplatz
+17,660678960,bar,China City,52.510634,13.3976268,,,Berlin,Leipziger Straße
+18,667022750,restaurant,Ristorante Fontana di Trevi,52.5112961,13.3978043,,,,
+19,739193777,restaurant,Sapa Sushi,52.5114214,13.3912474,,,Berlin,Kronenstraße
+20,775857971,restaurant,Delikat am Spittelmarkt,52.5088691,13.4049092,,,,
+21,875190277,restaurant,Cadadia,52.5114368,13.391466,+49 30 346 20808,http://www.cadadia.com/,Berlin,Charlottenstraße
+22,901804851,restaurant,Augustiner am Gendarmenmarkt,52.5138083,13.391068,+49 30 20454020,http://www.augustiner-braeu-berlin.de,Berlin,Charlottenstraße
+23,915773475,restaurant,Lungomare,52.5094177,13.3918636,,,Berlin,Krausenstraße
+24,918183881,restaurant,Dolcini,52.5138299,13.3867623,,,Berlin,Jägerstraße
+25,919906120,restaurant,La Via del Muro,52.5088616,13.3886209,,,Berlin,Mauerstraße
+26,1057538252,restaurant,Brasserie am Gendarmenmarkt,52.5134229,13.3940394,,,Berlin,Taubenstraße
+27,1110086631,restaurant,Super Ibérico,52.5053204,13.3940873,,,Berlin,Markgrafenstraße
+28,1120243900,restaurant,Spitteleck,52.5111321,13.4026843,+49 30 80492910,http://spitteleck.de/,Berlin,Seydelstraße
+29,1127222450,restaurant,Wirtshaus am Ufer,52.4990849,13.3861747,,,Berlin,Hallesches Ufer
+30,1251095626,restaurant,Peking Ente,52.5114767,13.3828541,,,Berlin,Voßstraße
+31,1271006408,restaurant,Willy's Bistro,52.500366,13.388343,,,Berlin,Wilhelmstraße
+32,1278753315,restaurant,piazza papà pane,52.5025227,13.3886738,,https://papapane.de/,Berlin,Wilhelmstraße
+33,1306551401,bar,Viet Bowl,52.5079443,13.3929391,,,Berlin,Zimmerstraße
+34,1397070400,restaurant,Peppone,52.510371,13.37852,,,Berlin,Leipziger Platz
+35,1431856371,restaurant,Steakhouse Asador,52.5036412,13.3880831,+49 30 25931818,https://restaurant-asador.de/,Berlin,Wilhelmstraße
+36,1453995663,restaurant,La Piccola,52.5054025,13.3974265,,,Berlin,Ritterstraße
+37,1484847608,restaurant,Diomira,52.5026176,13.3851524,,,Berlin,Hedemannstraße
+38,1602537128,restaurant,Noumi,52.5143727,13.3976164,+49 30 20649007,https://noumi-noodles.com/,Berlin,Jägerstraße
+39,1634049200,restaurant,Otito,52.5102517,13.3904689,,,Berlin,Leipziger Straße
+40,1675606837,restaurant,Huong Lua,52.5087983,13.3919174,,,Berlin,Charlottenstraße
+41,1693343179,restaurant,Hugo & Notte,52.5141922,13.3919267,+49 30 5268021730,https://hugo-und-notte.de/,Berlin,
+42,1726845091,restaurant,Delhi 6,52.5019404,13.3910883,+49 30 2516775,https://delhi6.de/,Berlin,Friedrichstraße
+43,1780605514,restaurant,Ristorante Bocca Felice,52.5087041,13.4045741,,,Berlin,Seydelstraße
+44,1780605521,restaurant,World of Pizza,52.5085311,13.4053466,+49 30 40044474,https://www.world-of-pizza.de/#berlin-mitte,Berlin,Seydelstraße
+45,1814087037,restaurant,Da Vinci,52.5043488,13.3910913,+49 30 20686904,https://hotel-angleterre.de/gastronomie/,,
+46,1839915551,bar,Restaurant Paracas II,52.5016407,13.3915274,,,Berlin,Friedrichstraße
+47,1964264412,bar,Braufactum Berlin,52.5133633,13.3959964,,,Berlin,Hausvogteiplatz
+48,2008618822,restaurant,Restaurant Glashaus,52.5051272,13.3972549,,,Berlin,Lindenstraße
+49,2008848628,bar,Kori & Fay,52.5069034,13.3910997,,,Berlin,Rudi-Dutschke-Straße
+50,2038343429,restaurant,Café Journale,52.5068334,13.3983221,+49 30 25292945,http://www.cafejournale.de,Berlin,Lindenstraße
+51,2121100044,restaurant,Nanoosh,52.5123148,13.3910599,,https://nanoosh-germany.de/,Berlin,Mohrenstraße
+52,2121100045,bar,Sagrantino,52.5158454,13.3901542,,http://www.sagrantino-winebar.de,,
+53,2181178770,restaurant,Tim Raue,52.506883,13.3913836,,,Berlin,Rudi-Dutschke-Straße
+54,2181178797,restaurant,Ishin,52.5079532,13.3926131,,,Berlin,Charlottenstraße
+55,2347992508,restaurant,Kantine Umweltministerium,52.507879,13.3783891,,,Berlin,Stresemannstraße
+56,2769572074,restaurant,Linh yu!,52.5060388,13.3800036,+49 30 26101607,,Berlin,Stresemannstraße
+57,2798961104,restaurant,Caramel,52.5076992,13.3930233,+49 30 25931958,http://www.caramelberlin.de/,Berlin,Zimmerstraße
+58,3102399604,restaurant,Hasir Beef Grill Club,52.5101883,13.3795899,,,,
+59,3347781754,restaurant,Yakoolza,52.5131181,13.3820385,+49 30 20605508,https://www.yakoolza-berlin.de/,Berlin,Wilhelmstraße
+60,3661696179,restaurant,Wilhelm & Medné - Bio-Bistro,52.5031163,13.3908407,+49 30 25359977,http://www.biobistro.de/,Berlin,Hedemannstraße
+61,3674888276,restaurant,Savory Chay,52.5112345,13.3879451,,,Berlin,Kronenstraße
+62,3718480033,restaurant,Nobelhart & Schmutzig,52.5053879,13.3905401,,,Berlin,Friedrichstraße
+63,3874640671,restaurant,Pagashi-Luu,52.5084245,13.3939439,+49 30 53793695,https://pagashiluu.eatbu.com/,Berlin,Markgrafenstraße
+64,3949774205,restaurant,Entrecôte,52.5084898,13.391317,,,Berlin,Schützenstraße
+65,4041294989,restaurant,Chupenga,52.5125016,13.3943233,+493023936961,http://www.chupenga.de,Berlin,Mohrenstraße
+66,4120984825,restaurant,Zen,52.51385,13.3872995,,,Berlin,Jägerstraße
+67,4149380189,restaurant,Bistro Vital,52.5114123,13.396851,,,,Jerusalemer Straße
+68,4188056695,restaurant,Little Green Rabbit,52.5087103,13.3893856,+49 30 37462003,https://www.littlegreenrabbit.de/checkpoint-charlie,Berlin,Friedrichstraße
+69,4188056696,restaurant,Veli's Restaurant,52.5087062,13.3899448,,,,
+70,4188062813,restaurant,Julian & Elisa,52.5148587,13.393238,,,Berlin,Markgrafenstraße
+71,4366482789,restaurant,Marea,52.50924,13.3796142,,https://marea-berlin.de/,Berlin,Leipziger Platz
+72,4387406689,restaurant,Dai An,52.5020083,13.3910785,,,Berlin,Friedrichstraße
+73,4423968000,restaurant,scent,52.5116329,13.401428,,,,
+74,4440690189,restaurant,Barcelona,52.506304,13.3903978,+49 30 7022 8336,,Berlin,Friedrichstraße
+75,4508185226,restaurant,Seaside,52.5120032,13.3902147,+49 30 209 17354,http://www.seaside-fish.com/,Berlin,Mohrenstraße
+76,4581843439,bar,Essenza,52.5100972,13.3833264,+49 30 20625083,http://www.ristorante-essenza.de/index_ls125.html,Berlin,Leipziger Straße
+77,4820085122,restaurant,Café Madame,52.4997694,13.3923025,,,Berlin,Mehringplatz
+78,4841062924,restaurant,Mama Cook,52.5029314,13.3886201,,http://www.mama-cook.de/,Berlin,Hedemannstraße
+79,4906261622,restaurant,Hayal Kahvesi,52.5070072,13.3925904,,https://hayalkahvesimeyhane.de/,Berlin,Charlottenstraße
+80,4936963663,restaurant,Shisomen,52.5121111,13.3810305,,,Berlin,Gertrud-Kolmar-Straße
+81,4948140427,bar,Layla,52.5015732,13.3829902,,,,Hallesche Straße
+82,5119724959,restaurant,Sapori del Sud,52.5080178,13.3919864,,,,
+83,5133857265,restaurant,Yarok,52.5070028,13.386008,,,Berlin,Wilhelmstraße
+84,5155574229,restaurant,Little Green Rabbit,52.5140282,13.3957076,,,Berlin,Jägerstraße
+85,5173670205,restaurant,Hatay Ocakbaşi,52.5067848,13.3896887,+49 30 76953419,https://hatay-ocakbasi.de/,Berlin,Kochstraße
+86,5196452422,restaurant,Lunchtime,52.5142513,13.3971703,,,Berlin,Jägerstraße
+87,5241392760,restaurant,Brasserie Le Bon Mori,52.4995958,13.3878921,,,Berlin,Stresemannstraße
+88,5398239819,restaurant,Zhong Hua,52.5048782,13.3970187,+49 30 2511615,https://www.zhong-hua.de/,Berlin,Lindenstraße
+89,5406791923,bar,Avanti,52.5072987,13.3784521,,,Berlin,Stresemannstraße
+90,5443013625,restaurant,Huong Sen,52.50832,13.393952,,,Berlin,Markgrafenstraße
+91,5620262724,bar,The Sushi Club,52.5125208,13.3946586,,https://thesushiclub.de/,Berlin,Mohrenstraße
+92,5810390264,restaurant,Teras,52.5117473,13.3835168,,,Berlin,Wilhelmstraße
+93,5823398335,restaurant,Vapiano,52.5087471,13.3904174,,,,
+94,5868881267,restaurant,Lavida Wine Club,52.513162,13.3945066,+49 30 239 20 610,,Berlin,Taubenstraße
+95,5962646496,restaurant,Nanum,52.5025659,13.3940139,,https://www.nanumberlin.com/,Berlin,Lindenstraße
+96,6013893343,restaurant,ERGO Gourmet,52.5067326,13.3790788,,,,
+97,6051450985,restaurant,Taz Kantine,52.5033533,13.3912473,,http://www.taz.de/!106584/,Berlin,Friedrichstraße
+98,6066639232,restaurant,Ristorante Sale e Tabacchi,52.5066487,13.3913866,,,Berlin,Rudi-Dutschke-Straße
+99,6201545247,restaurant,Liu Chengdu Weidao,52.5111972,13.38759,,,Berlin,Kronenstraße
+100,6503900885,restaurant,Pizza El Fredo,52.5019116,13.3914666,+49 30 28477913,https://www.pizzaelfredo.de/,Berlin,Friedrichstraße
+101,6539518434,restaurant,beets&roots,52.5094463,13.3879255,,,Berlin,Mauerstraße
+102,6665721748,restaurant,Café Nullpunkt,52.5034178,13.3929014,+49 30 84710923,https://cafenullpunkt.com/,Berlin,Friedrichstraße
+103,6705038985,restaurant,Café 4YOU,52.5118879,13.3885337,,,Berlin,Mohrenstraße
+104,6706708817,restaurant,Babami,52.5076191,13.3916108,,,,
+105,6707387950,bar,Intermezzo,52.5129491,13.3866473,,,,
+106,6785118828,restaurant,Sons of Mana,52.5125939,13.3902113,,http://sonsofmana.de/,Berlin,Friedrichstraße
+107,6832874802,restaurant,Viti,52.511701,13.3827752,,,Berlin,Wilhelmstraße
+108,8105267087,restaurant,Mirami,52.5018737,13.385995,,,,
+109,9094325081,restaurant,Frittenwerk,52.512264,13.389813,,,,
+110,9279980915,restaurant,Das Berliner Restaurant,52.5112684,13.380657,,,Berlin,Voßstraße
+111,9334027317,restaurant,Maredo,52.5127552,13.3910511,,https://www.maredo.com/steakhaeuser/berlin-gendarmenmarkt/,Berlin,Charlottenstraße
+112,9337575527,restaurant,Bless,52.5124319,13.3967248,,https://www.bless-restaurants.com/,Berlin,Hausvogteiplatz
+113,9677505904,restaurant,Ma'loa Hawaiian Poke Bowl,52.5080139,13.3935011,,,,
+114,9705012917,restaurant,Beba,52.5066992,13.3816381,,,,
+115,9798306524,bar,Army Food,52.5083501,13.389846,,,Berlin,Mauerstraße
+116,9907698036,bar,Al Catzone - Pizza Napovegana,52.498717,13.3930573,,,Berlin,Brandesstraße
+117,9999389413,bar,Hai Coffee,52.5111836,13.4032313,,,,Wallstraße
