@@ -92,7 +92,7 @@ for i in range(len(display_data)):
 folium.Circle(
     location=[info_input.lat.mean(),info_input.lon.mean()],
     radius=radius,
-    popup="Laurelhurst Park",
+    popup=f"{radius }m Radius",
     color="#3186cc",
     fill=True,
     fill_color="#3186cc",
