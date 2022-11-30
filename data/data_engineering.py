@@ -1,6 +1,7 @@
 import pandas as pd
 import io
 import requests
+import geopy
 
 #Function takes address as input and returns latitude and longitude
 def get_location(address):
@@ -43,7 +44,7 @@ def column_selection(location,column_name):
 
 #Function to update the dateframe with sub column selection
 def subcolumn_selection(df, column_name,subcolumn_name):
-    return df[df[column_name]==subcolumn_name]
+    return df[df[column_name]==subcolumn_name].reset_index(drop=True)
 
 if __name__ == '__main__':
     address=input("please enter the address:")
