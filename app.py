@@ -3,7 +3,6 @@ import streamlit as st
 #from streamlit_lottie import st_lottie
 from streamlit_option_menu import option_menu
 from geopy.geocoders import Nominatim
-
 from prettymapp.geo import get_aoi
 from prettymapp.osm import get_osm_geometries
 from prettymapp.plotting import Plot
@@ -51,7 +50,7 @@ with st.sidebar:
 #type(location1)
 
 
-sentence = st.text_input("Write street name:")
+sentence = st.text_input("Write street name:", 'Berlin, goltzstr 13')
 
 
 geolocator = Nominatim(user_agent='automated_location_analysis')
@@ -89,16 +88,16 @@ if val!=50:
 
 #map----------------
 
-aoi = get_aoi(address=location1, distance=500, rectangular=True)
-df = get_osm_geometries(aoi=aoi)
+# aoi = get_aoi(address=location1, distance=500, rectangular=True)
+# df = get_osm_geometries(aoi=aoi)
 
 
-fig = Plot(
-    df=df,
-    aoi_bounds=aoi.bounds,
-    draw_settings=STYLES["Peach"]
-    ).plot_all()
+# fig = Plot(
+#     df=df,
+#     aoi_bounds=aoi.bounds,
+#     draw_settings=STYLES["Peach"]
+#     ).plot_all()
 
-df = pd.DataFrame({'lat':[location1.longitude],'lon':[location1.latitude]})
+df = pd.DataFrame([[location1.longitude, location1.latitude]], columns = ['lon', 'lat'])
 
-st.map(aoi)
+st.map(df, zoom = 10)
