@@ -44,3 +44,13 @@ def column_selection(location,column_name):
 #Function to update the dateframe with sub column selection
 def subcolumn_selection(df, column_name,subcolumn_name):
     return df[df[column_name]==subcolumn_name]
+
+if __name__ == '__main__':
+    address=input("please enter the address:")
+    preference=input ('select yor interests ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"):')
+    location=get_location(address)
+    # df=get_complete_data(location)
+    df_cleaned=column_selection(location, preference)
+    subcolumn=input('select your sub interests:')
+    df_final=subcolumn_selection(df_cleaned, preference,subcolumn)
+    print(df_final.head(20))
