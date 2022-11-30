@@ -4,7 +4,7 @@ import pydeck as pdk
 import streamlit as st
 import folium
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, get_complete_data, column_selection, subcolumn_selection
+from data.data_engineering import get_location, get_complete_data, column_selection, subcolumn_selection, distance_calculation
 import io
 import requests
 import geopy
@@ -21,13 +21,13 @@ st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 ##############################################################################
 
 # Street Input:
-address = st.text_input('Adress')
+address = st.text_input('Adress', 'Please Input the Adress')
 
 #preferences, the User is able to choose from:
 preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
 
 # Radius Selector:
-
+radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
 
 ##############################################################################
 ######### Data to be used ####################################################
@@ -37,7 +37,17 @@ preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "
 location=get_location(address)
 
 # DataFrame for our class selection:
-df_cleaned=column_selection(location, preferences)
+
+if address  != 'Please Input the Adress':
+    @st.cache()
+    def first():
+        return column_selection(location, preferences)
+
+    df_cleaned = first()
+
+else:
+    df_cleaned = 0
+
 #st.write(df_cleaned)
 
 # Subcat Selector:
@@ -59,19 +69,24 @@ subcolumn = st.multiselect('Preferences', options = (df_cleaned[preferences].uni
 
 #defining the data to be displayed in the class data frame. We might be able to use subclass_data.
 #class_data = info_input[info_input[preferences].isin(checks_classes)].reset_index()
-class_data = df_cleaned
 
 ##############################################################################
 ## Data Cleaning Step 2 - Subclasses #########################################
 ##############################################################################
 
 subclass_check = list(subcolumn)
+#st.write(subclass_check)
 #for i in range(len(subcolumn)):
   #  subclass_check.append(subcolumn[i])
 
 
 t = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
-display_data = t.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'}).reset_index()
+
+display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
+
+display_data = distance_calculation(display_data,location,distance=radius)
+
+#display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
 #st.write(display_data)
 ##############################################################################
 ################### Displaying Data  #########################################
@@ -96,15 +111,21 @@ for i in range(len(display_data)):
                 icon = folium.Icon(color = 'red',
                                     icon = 'info-sign')).add_to(map)
 
+folium.Marker([location[0],location[1]],
+                icon = folium.Icon(color = 'blue',
+                                    icon = 'info-sign')).add_to(map)
+
+
 #creating a radius:
 folium.Circle(
-    location=[display_data.lat.mean(),display_data.lon.mean()],
-    radius=2000, #hardcoded for now
-    popup=f"2000m Radius", #hardcoded for now
+    location=location,
+    radius=radius, #hardcoded for now
+    popup=f"{radius}m Radius", #hardcoded for now
     color="#3186cc",
     fill=True,
     fill_color="#3186cc",
 ).add_to(map)
+
 
 
 #displaying the map:
