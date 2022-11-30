@@ -16,51 +16,46 @@ import geopy
 #defining the map layout:
 st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 
+##############################################################################
+######### Query Input #########################################################
+##############################################################################
+
+# Street Input:
+address = st.text_input('Adress')
+
+#preferences, the User is able to choose from:
+preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
+
+# Radius Selector:
+
 
 ##############################################################################
 ######### Data to be used ####################################################
 ##############################################################################
 
-#Street, the user wants to search for:
-address = st.text_input('Adress')
-preferences = st.selectbox(' Preferences', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
+#function that gets the location data:
 location=get_location(address)
 
-# DataFrame for our class selection
+# DataFrame for our class selection:
 df_cleaned=column_selection(location, preferences)
 #st.write(df_cleaned)
 
+# Subcat Selector:
+subcolumn = st.multiselect('Preferences', options = (df_cleaned[preferences].unique()))
 
-# DataFrame for our class selection
-subcolumn = st.selectbox('Preferences', options = (df_cleaned[preferences]))
-
-
-info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
+#Final DataFrame, that only shows the selected subcolumns:
+#info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
 #st.write(info_input)
 
-
-
-##############################################################################
-######### Query Input ########################################################
-##############################################################################
-
-#Input params:
-#radius = st.slider('Radius',100,5000,1000,50)
-#Selector on the webiste:
+#Renaming the Data to be used in the final frame:
+#display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
 
 ##############################################################################
-### Data Cleaning Step 2 - Classes ###########################################
+### Data Cleaning Step 1 - Classes ###########################################
 ##############################################################################
 
-###### this checks the classes.
-checks_classes = df_cleaned[preferences].unique()
-
-#giving each amenity a color:
-color = {
-         'bar' : 'red',
-         'restaurant': 'blue'
-         }
-
+###### this checks the classes available.
+#checks_classes = df_cleaned[preferences].unique()
 
 #defining the data to be displayed in the class data frame. We might be able to use subclass_data.
 #class_data = info_input[info_input[preferences].isin(checks_classes)].reset_index()
@@ -70,21 +65,27 @@ class_data = df_cleaned
 ## Data Cleaning Step 2 - Subclasses #########################################
 ##############################################################################
 
-#subclass = list(subcolumn[preferences].unique())
-#st.write(subclass)
+subclass_check = list(subcolumn)
+#for i in range(len(subcolumn)):
+  #  subclass_check.append(subcolumn[i])
 
-#checks_subclass = info_input[preferences].unique()
 
-#display_data = class_data[class_data['id'].isin(checks_subclass)].reset_index()
-display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
+t = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
+display_data = t.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'}).reset_index()
 #st.write(display_data)
 ##############################################################################
 ################### Displaying Data  #########################################
 ##############################################################################
 
 
+#giving each amenity a color:
+color = {
+         'bar' : 'red',
+         'restaurant': 'blue'
+         }
+
 #initilaizing our map
-map = folium.Map(location=[display_data.lat.mean(), display_data.lon.mean()], zoom_start=14, control_scale=True)
+map = folium.Map(location = location, zoom_start=14, control_scale=True)
 
 
 #getting all the selected datapoints into the map (we only display up to 100 datapoints)
