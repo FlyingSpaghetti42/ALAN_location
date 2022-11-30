@@ -1,6 +1,7 @@
 import pandas as pd
 import io
 import requests
+from geopy.distance import geodesic
 
 #Function takes address as input and returns latitude and longitude
 def get_location(address):
@@ -35,15 +36,28 @@ def get_complete_data(location, radius=2000):
 def column_selection(location,column_name):
     df=get_complete_data(location)
     list_columns=[ "shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"]
-    df_column_selected= df.dropna(subset=[column_name, 'name'])
+    list_address=['name','addr:street','addr:housenumber','addr:suburb','addr:city','addr:postcode',
+                  'addr:country','contact:phone','contact:website']
+    df_amenity= df.dropna(subset=[column_name, 'name'])
+    df_amenity.rename(columns={"@lon":"longitude", "@lat":"latitude"}, inplace=True)
     list_columns.remove(column_name)
-    df_column_selected.drop(columns=list_columns, inplace=True)
-    df_column_selected.reset_index(inplace=True, drop=True)
-    return df_column_selected
+    df_amenity.drop(columns=list_columns, inplace=True)
+    df_amenity.fillna(" ",inplace=True)
+    df_amenity["address"]=df_amenity[list_address].astype(str).apply(",".join, axis=1)
+    df_amenity["address"]=df_amenity["address"].apply(lambda x: x.strip(', '))
+    list_address.remove('name')
+    df_amenity.drop(columns=list_address, inplace=True)
+    df_amenity.reset_index(inplace=True, drop=True)
+    return df_amenity
 
 #Function to update the dateframe with sub column selection
 def subcolumn_selection(df, column_name,subcolumn_name):
-    return df[df[column_name]==subcolumn_name]
+    return df[df[column_name]in subcolumn_name]
+
+#Function calculates the distance from the center
+def distance_calculation(df,location,distance=2000):
+    df['distance']= df.apply(lambda df: geodesic(location, (df.latitude,df.longitude)).m, axis=1)
+    return df[df['distance']<distance].sort_values(by=["distance"]).reset_index(drop=True)
 
 if __name__ == '__main__':
     address=input("please enter the address:")
@@ -51,6 +65,6 @@ if __name__ == '__main__':
     location=get_location(address)
     # df=get_complete_data(location)
     df_cleaned=column_selection(location, preference)
-    subcolumn=input('select your sub interests:')
-    df_final=subcolumn_selection(df_cleaned, preference,subcolumn)
-    print(df_final.head(20))
+    # subcolumn=input('select your sub interests:')
+    # df_final=subcolumn_selection(df_cleaned, preference,subcolumn)
+    print(df_cleaned.head(20))
