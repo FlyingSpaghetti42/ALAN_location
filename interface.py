@@ -94,11 +94,40 @@ display_data = distance_calculation(display_data,location,distance=radius)
 
 
 #giving each amenity a color:
-color = {
-         'bar' : 'red',
-         'restaurant': 'blue'
-         }
+def colors():
+    if len(subclass_check) == 1:
+        color = {
+                subclass_check[0] : 'red',
+                }
+    elif len(subclass_check) == 2:
+        color = {
+                subclass_check[0] : 'red',
+                subclass_check[1] : 'green'
+                }
+    elif len(subclass_check) == 3:
+        color = {
+                subclass_check[0] : 'red',
+                subclass_check[1] : 'green',
+                subclass_check[2] : 'pink'
+                }
+    elif len(subclass_check) == 4:
+        color = {
+                subclass_check[0] : 'red',
+                subclass_check[1] : 'green',
+                subclass_check[2] : 'pink',
+                subclass_check[3] : 'blue'
+                }
+    elif len(subclass_check) == 5:
+        color = {
+                subclass_check[0] : 'red',
+                subclass_check[1] : 'green',
+                subclass_check[2] : 'pink',
+                subclass_check[3] : 'lightgreen',
+                subclass_check[4] : 'blue'
+                }
+    return color
 
+color = colors()
 #initilaizing our map
 map = folium.Map(location = location, zoom_start=14, control_scale=True)
 
@@ -108,7 +137,7 @@ for i in range(len(display_data)):
     folium.Marker([display_data.lat[i],
                 display_data.lon[i]],
                 popup=display_data['name'][i],
-                icon = folium.Icon(color = 'red',
+                icon = folium.Icon(color = color[display_data[preferences][i]],
                                     icon = 'info-sign')).add_to(map)
 
 folium.Marker([location[0],location[1]],
