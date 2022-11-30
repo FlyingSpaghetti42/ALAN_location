@@ -11,7 +11,7 @@ from data_.data import cleaning
 ##############################################################################
 
 #defining the map layout:
-st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':sheep:')
+st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 
 
 ##############################################################################
