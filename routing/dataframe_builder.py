@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from geodistances import distance_beeline
-from utils import transform_km, transform_min
+from routing.geodistances import distance_beeline
+from routing.utils import transform_km, transform_min
 
 def df_preprocess(df):
 #function to only select the first 13 items from the dataframe.

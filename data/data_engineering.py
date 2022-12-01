@@ -39,7 +39,7 @@ def column_selection(location,column_name):
     list_address=['name','addr:street','addr:housenumber','addr:suburb','addr:city','addr:postcode',
                   'addr:country','contact:phone','contact:website']
     df_amenity= df.dropna(subset=[column_name, 'name'])
-    df_amenity.rename(columns={"@lon":"longitude", "@lat":"latitude"}, inplace=True)
+    df_amenity.rename(columns={"@lon":"lon", "@lat":"lat"}, inplace=True)
     list_columns.remove(column_name)
     df_amenity.drop(columns=list_columns, inplace=True)
     df_amenity.fillna(" ",inplace=True)

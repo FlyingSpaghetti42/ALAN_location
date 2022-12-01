@@ -1,14 +1,12 @@
-import pandas as pd
-import numpy as np
-import pydeck as pdk
 import streamlit as st
 import folium
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, get_complete_data, column_selection, subcolumn_selection, distance_calculation
-import io
-import requests
-import geopy
+from data.data_engineering import get_location, column_selection, distance_calculation
 from data.colors import colors
+from data.distance import manhattan_distance_vectorized
+from routing.dataframe_builder import df_preprocess, df_add_dist_dur, df_transform_dist_dur, df_add_beeline, df_transform_beeline
+import requests
+from geopy.distance import geodesic
 
 ##############################################################################
 ######### Map Layout #########################################################
@@ -21,6 +19,7 @@ st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 ######### Query Input #########################################################
 ##############################################################################
 
+
 # Street Input:
 address = st.text_input('Adress', 'Please Input the Adress')
 
@@ -29,6 +28,18 @@ preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "
 
 # Radius Selector:
 radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
+
+walker_speed = st.selectbox(' How fast do you walk', options = ("fast", "medium", "slow"))
+
+def speed():
+    if walker_speed == 'fast':
+        return (7000)
+    elif walker_speed == 'medium':
+        return (4000)
+    elif walker_speed == 'slow':
+        return (3000)
+
+time_min_km = speed()
 
 ##############################################################################
 ######### Data to be used ####################################################
@@ -87,11 +98,29 @@ display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name':
 
 display_data = distance_calculation(display_data,location,distance=radius)
 
+
+distance = manhattan_distance_vectorized(location[0],location[1],display_data.lat, display_data.lon)
+#st.write(distance)
+
+#customize
+
+display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
+
 #display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
 #st.write(display_data)
 ##############################################################################
+################### Getting Routes  ##########################################
+##############################################################################
+
+
+
+
+
+##############################################################################
 ################### Displaying Data  #########################################
 ##############################################################################
+
+
 
 
 #giving each amenity a color:
