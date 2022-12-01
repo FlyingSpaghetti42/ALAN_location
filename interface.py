@@ -139,7 +139,6 @@ try:
 
 
 
-
     #giving each amenity a color:
     color = colors(subclass_check)
     #initilaizing our map
@@ -152,15 +151,14 @@ try:
     for i in range(len(display_data)):
         folium.Marker([display_data.lat[i],
                     display_data.lon[i]],
-                    popup=display_data['name'][i],
-
+                    popup=f'<i> {display_data.name[i]} </i>',
                     icon = folium.Icon(color = color[display_data[preferences][i]],
                                         icon = 'info-sign')).add_to(map)
 
 
     folium.Marker([location[0],location[1]],
-                    icon = folium.Icon(color = 'blue',
-                                        icon = 'info-sign')).add_to(map)
+                    popup = '<b>You</b>',
+                    icon = folium.Icon(color='blue', icon='alien', prefix = 'fa')).add_to(map)
 
     #creating a radius:
     folium.Circle(
@@ -171,6 +169,7 @@ try:
         fill=True,
         fill_color="#3186cc",
     ).add_to(map)
+
 
     #displaying the map:
     st_folium.folium_static(map, width = 1600, height = 1000)
