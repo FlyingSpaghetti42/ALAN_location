@@ -8,6 +8,7 @@ from data.data_engineering import get_location, get_complete_data, column_select
 import io
 import requests
 import geopy
+from data.colors import colors
 
 ##############################################################################
 ######### Map Layout #########################################################
@@ -94,42 +95,11 @@ display_data = distance_calculation(display_data,location,distance=radius)
 
 
 #giving each amenity a color:
-def colors():
-    if len(subclass_check) == 1:
-        color = {
-                subclass_check[0] : 'red',
-                }
-    elif len(subclass_check) == 2:
-        color = {
-                subclass_check[0] : 'red',
-                subclass_check[1] : 'green'
-                }
-    elif len(subclass_check) == 3:
-        color = {
-                subclass_check[0] : 'red',
-                subclass_check[1] : 'green',
-                subclass_check[2] : 'pink'
-                }
-    elif len(subclass_check) == 4:
-        color = {
-                subclass_check[0] : 'red',
-                subclass_check[1] : 'green',
-                subclass_check[2] : 'pink',
-                subclass_check[3] : 'blue'
-                }
-    elif len(subclass_check) == 5:
-        color = {
-                subclass_check[0] : 'red',
-                subclass_check[1] : 'green',
-                subclass_check[2] : 'pink',
-                subclass_check[3] : 'lightgreen',
-                subclass_check[4] : 'blue'
-                }
-    return color
-
-color = colors()
+color = colors(subclass_check)
 #initilaizing our map
-map = folium.Map(location = location, zoom_start=14, control_scale=True)
+map = folium.Map(location = location,
+                 zoom_start=14,
+                 control_scale=True)
 
 
 #getting all the selected datapoints into the map (we only display up to 100 datapoints)
@@ -140,10 +110,11 @@ for i in range(len(display_data)):
                 icon = folium.Icon(color = color[display_data[preferences][i]],
                                     icon = 'info-sign')).add_to(map)
 
+
+
 folium.Marker([location[0],location[1]],
                 icon = folium.Icon(color = 'blue',
                                     icon = 'info-sign')).add_to(map)
-
 
 #creating a radius:
 folium.Circle(
@@ -155,9 +126,6 @@ folium.Circle(
     fill_color="#3186cc",
 ).add_to(map)
 
-
-
 #displaying the map:
 st_folium.folium_static(map, width = 1600, height = 1000)
-
 st.dataframe(display_data, width = 1600)
