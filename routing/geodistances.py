@@ -1,8 +1,8 @@
 import requests
 from geopy.distance import geodesic
-
 import time
 import requests
+
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 
 # add to streamlit: option to choose mode of mobility
@@ -44,9 +44,9 @@ def routing(mode:str,
     '''
     # specify mode and base-url
     modes_dict = {
-        'bike': 'cycling-regular',
+        'bikeing': 'cycling-regular',
         'walking': 'foot-walking',
-        'car': 'driving-car'
+        'driving': 'driving-car'
     }
     url = url + modes_dict[mode]
 
@@ -207,3 +207,55 @@ def routing_final(df,
         dist_mode.append(request[0])
         dur_mode.append(request[1])
     return dist_mode, dur_mode
+
+
+def get_isochrone(mode:str,
+                  locations, # at centre of isochrone (e.g.[[13.38895,52.515115]])
+                  api_key:str,
+                  url = 'https://api.openrouteservice.org/v2/isochrones/',
+                  range_iso = [900,600,300],
+                  range_type = 'time',
+                  attributes = ["total_pop"]):
+    '''
+    This function does an api request to the ors api to get isochrones
+    around the location of interest, showcasing for the mode selected
+    how far one could get in 5, 10, and 15 minutes (areas of reachability)
+
+    Parameters:
+    url: the base url for the api request; the 'isochrones' endpoint specifies
+        that we want to get the isochrones
+    mode: options to choose - in the interface the user will select between:
+        car, walk, bike, which in the function will transform to the parameter
+        values 'driving-car','cycling-regular', and 'foot-walking'
+    locations: here the location to searched will be inputted based on
+        the coordinates generated when inputting the location.
+        Input format: [[13.38895,52.515115]]; one could also pass multiple
+        locations, however there is a limit of 5 set by ors
+    range_iso: defines the isochrone distances, default is set to 5,10, and
+        15 minutes.
+    range_type: defines the unit of measurement used for defining the range_iso,
+        alternative specification is: distance in meters
+    attributes: also passes some population information for the isochrones
+    '''
+    modes_dict = {
+        'bikeing': 'cycling-regular',
+        'walking': 'foot-walking',
+        'driving': 'driving-car'
+    }
+    mode = modes_dict[mode]
+    base_url = url + mode
+    headers = {
+        'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+        'Authorization': api_key,
+        'Content-Type': 'application/json; charset=utf-8'
+    }
+
+    body = {
+        "locations": locations,
+        "range":range_iso, #time in seconds
+        "range_type":range_type,
+        "attributes": attributes
+    }
+
+    result = requests.post(base_url,json=body,headers=headers).json()
+    return result
