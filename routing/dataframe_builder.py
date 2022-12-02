@@ -1,48 +1,31 @@
 import pandas as pd
 import numpy as np
-from routing.geodistances import distance_beeline
 from routing.utils import transform_km, transform_min
 
-def routing_limitation(df):
-#function to only select the first 13 items from the dataframe.
-#Adjust to 40 items later on.
-    #df = df.drop(columns=['Unnamed: 0','@id'])
-    #df = df.replace(np.nan, 'Not Available')
-    #df = df.rename(columns={'@lat':'lat', '@lon':'lon'})
-    df = df[0:12]
-    return df
 
 def df_add_dist_dur(df,
-                    dist_walk,
-                    dur_walk,
-                    dist_cycl_reg,
-                    dur_cycl_reg,
-                    dist_cycl_e,
-                    dur_cycl_e):
-    df['dist_walk'] = dist_walk
-    df['dur_walk'] = dur_walk
-    df['dist_cycl_reg'] = dist_cycl_reg
-    df['dur_cycl_reg'] = dur_cycl_reg
-    df['dist_cycl_e'] = dist_cycl_e
-    df['dur_cycl_e'] = dur_cycl_e
+                    dist_mode,
+                    dur_mode):
+    df['dist_mode'] = dist_mode
+    df['dur_mode'] = dur_mode
     return df
 
 def df_transform_dist_dur(df):
-    df['dist_walk'] = df['dist_walk'].apply(lambda x: transform_km(x))
-    df['dur_walk'] = df['dur_walk'].apply(lambda x: transform_min(x))
-    df['dist_cycl_reg'] = df['dist_cycl_reg'].apply(lambda x: transform_km(x))
-    df['dur_cycl_reg'] = df['dur_cycl_reg'].apply(lambda x: transform_min(x))
-    df['dist_cycl_e'] = df['dist_cycl_e'].apply(lambda x: transform_km(x))
-    df['dur_cycl_e'] = df['dur_cycl_e'].apply(lambda x: transform_min(x))
+    df['dist_mode'] = df['dist_mode'].apply(lambda x: transform_km(x))
+    df['dur_mode'] = df['dur_mode'].apply(lambda x: transform_min(x))
+#    df['dist_cycl_reg'] = df['dist_cycl_reg'].apply(lambda x: transform_km(x))
+#    df['dur_cycl_reg'] = df['dur_cycl_reg'].apply(lambda x: transform_min(x))
+#    df['dist_cycl_e'] = df['dist_cycl_e'].apply(lambda x: transform_km(x))
+#    df['dur_cycl_e'] = df['dur_cycl_e'].apply(lambda x: transform_min(x))
     return df
 
-def df_add_beeline(df, lat_start, lon_start):
-    df['beeline'] = df.apply(lambda row:
-                                    distance_beeline(lat_start,
-                                                        lon_start,
-                                                        row.lat,
-                                                        row.lon), axis=1)
-    return df
+#def df_add_beeline(df, lat_start, lon_start):
+#    df['beeline'] = df.apply(lambda row:
+#                                    distance_beeline(lat_start,
+#                                                        lon_start,
+#                                                        row.lat,
+#                                                        row.lon), axis=1)
+#    return df
 
 def df_transform_beeline(df):
     df['beeline'] = df['beeline'].apply(lambda x: transform_km(x))

@@ -5,7 +5,7 @@ import streamlit_folium as st_folium
 from data.data_engineering import get_location, column_selection, distance_calculation
 from data.colors import colors
 from data.distance import manhattan_distance_vectorized
-from routing.dataframe_builder import routing_limitation, df_add_dist_dur, df_transform_dist_dur
+from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
 from routing.geodistances import routing_final
 from routing.utils import speed
 
@@ -29,7 +29,7 @@ address = st.text_input('Adress', 'Please Input the Adress')
 
 #preferences, the User is able to choose from:
 preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
-
+mode = st.selectbox(' Choose the mode', options = ("bikeing", "walking", "driving"))
 # Radius Selector:
 radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
 
@@ -104,17 +104,9 @@ if checker == False:
 
 else:
     df = distance_calculation(display_data,location,distance=radius)
-    df = routing_limitation(display_data)
+    dist_mode, dur_mode= routing_final(df,location[0],location[1],api_key, mode = mode)
 
-    dist_walk, dur_walk, dist_cycl_reg, dur_cycl_reg, dist_cycl_e, dur_cycl_e= routing_final(df,location[0],location[1],api_key)
-
-    df = df_add_dist_dur(df,
-                    dist_walk,
-                    dur_walk,
-                    dist_cycl_reg,
-                    dur_cycl_reg,
-                    dist_cycl_e,
-                    dur_cycl_e)
+    df = df_add_dist_dur(df, dist_mode, dur_mode)
 
     display_data = df_transform_dist_dur(df)
 
