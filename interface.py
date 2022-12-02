@@ -8,6 +8,7 @@ from data.distance import manhattan_distance_vectorized
 from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
 from routing.geodistances import routing_final
 from routing.utils import speed
+from routing.geodistances import get_isochrone
 
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 
@@ -155,7 +156,7 @@ for i in range(len(display_data)):
         </tr>
         <tr>
             <th>Amenity</th>
-            <td>{display_data['shop'][i]}</td>
+            <td>{display_data[preferences][i]}</td>
         </tr>
         <tr>
             <th> Distance </th>
@@ -197,9 +198,9 @@ folium.Circle(
 location=location,
 radius=radius, #hardcoded for now
 popup=f"{radius}m Radius", #hardcoded for now
-color="#3186cc",
+color="#696969",
 fill=True,
-fill_color="#3186cc",
+fill_color="#696969",
 ).add_to(map)
 
 #displaying the map:
@@ -211,6 +212,19 @@ fmtr = "function(num) {return L.Util.formatNum(num, 3);};"
 #loc = plugins.MousePosition(position='topright', separator=' , ',numDigits = 6,
 #              lat_formatter=fmtr, lng_formatter=fmtr).add_to(map)
 
+
+results = get_isochrone(mode, [[location[1], location[0]]], api_key)
+
+checker_iso = st.checkbox('Isochrome',)
+if checker_iso == True:
+    for isochrone in results['features']:
+        folium.Polygon(locations=[list(reversed(coord)) for coord in isochrone['geometry']['coordinates'][0]],
+                    fill='00ff00',
+                    popup=folium.Popup("Population: {} people".format(isochrone['properties']['total_pop'])),
+                    opacity=0.5).add_to(map)
+
+else:
+    pass
 
 st_folium.folium_static(map, width = 1600, height = 1000)
 
