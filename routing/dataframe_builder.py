@@ -3,12 +3,12 @@ import numpy as np
 from routing.geodistances import distance_beeline
 from routing.utils import transform_km, transform_min
 
-def df_preprocess(df):
+def routing_limitation(df):
 #function to only select the first 13 items from the dataframe.
 #Adjust to 40 items later on.
-    df = df.drop(columns=['Unnamed: 0','@id'])
-    df = df.replace(np.nan, 'Not Available')
-    df = df.rename(columns={'@lat':'lat', '@lon':'lon'})
+    #df = df.drop(columns=['Unnamed: 0','@id'])
+    #df = df.replace(np.nan, 'Not Available')
+    #df = df.rename(columns={'@lat':'lat', '@lon':'lon'})
     df = df[0:12]
     return df
 
