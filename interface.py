@@ -1,12 +1,11 @@
 import streamlit as st
 import folium
+import pandas as pd
 import streamlit_folium as st_folium
 from data.data_engineering import get_location, column_selection, distance_calculation, subcolumn_selection
 from data.colors import colors
 from data.distance import manhattan_distance_vectorized
 from routing.dataframe_builder import routing_limitation, df_add_dist_dur, df_transform_dist_dur, df_add_beeline, df_transform_beeline
-import requests
-from geopy.distance import geodesic
 from routing.geodistances import routing_final
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 
@@ -34,13 +33,14 @@ try:
 
     walker_speed = st.selectbox(' How fast do you walk', options = ("fast", "medium", "slow"))
 
+    checker = st.checkbox('Routing',)
     def speed():
-         if walker_speed == 'fast':
-             return (7000)
-         elif walker_speed == 'medium':
-             return (4000)
-         elif walker_speed == 'slow':
-             return (3000)
+        if walker_speed == 'fast':
+            return (7000)
+        elif walker_speed == 'medium':
+            return (4000)
+        elif walker_speed == 'slow':
+            return (3000)
 
     time_min_km = speed()
 
@@ -69,11 +69,11 @@ try:
     subcolumn = st.multiselect('Preferences', options = (df_cleaned[preferences].unique()))
 
     #Final DataFrame, that only shows the selected subcolumns:
-    info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
+    #info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
     #st.write(info_input)
 
     #Renaming the Data to be used in the final frame:
-    display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
+    #display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
 
     ##############################################################################
     ### Data Cleaning Step 1 - Classes ###########################################
@@ -92,49 +92,49 @@ try:
     subclass_check = list(subcolumn)
 
     for i in range(len(subcolumn)):
-      subclass_check.append(subcolumn[i])
+        subclass_check.append(subcolumn[i])
 
 
     t = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
     display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
 
-    display_data = distance_calculation(display_data,location,distance=radius)
+    if checker == False:
+        display_data = distance_calculation(display_data,location,distance=radius)
 
+        distance = manhattan_distance_vectorized(location[0],location[1],display_data.lat, display_data.lon)
 
-    distance = manhattan_distance_vectorized(location[0],location[1],display_data.lat, display_data.lon)
-    #st.write(distance)
+        #customize
 
-    #customize
+        display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
 
-    display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
+        display_data['biking time'] = display_data.distance.apply(lambda x: (x*60)/13000)
 
-    display_data['biking time'] = display_data.distance.apply(lambda x: (x*60)/13000)
+        display_data['E-Biking time'] = display_data.distance.apply(lambda x: (x*60)/18000)
 
-    display_data['E-Biking time'] = display_data.distance.apply(lambda x: (x*60)/18000)
+        #display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
 
-    display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
-    #st.write(display_data)
     ##############################################################################
     ################### Getting Routes  ##########################################
     ##############################################################################
 
+    else:
+        df = distance_calculation(display_data,location,distance=radius)
+        df = routing_limitation(display_data)
 
-    #df = routing_limitation(display_data)
+        dist_walk, dur_walk, dist_cycl_reg, dur_cycl_reg, dist_cycl_e, dur_cycl_e= routing_final(df,location[0],location[1],api_key)
 
-    #dist_walk, dur_walk, dist_cycl_reg, dur_cycl_reg, dist_cycl_e, dur_cycl_e= routing_final(df,location[0],location[1],api_key)
+        df = df_add_dist_dur(df,
+                        dist_walk,
+                        dur_walk,
+                        dist_cycl_reg,
+                        dur_cycl_reg,
+                        dist_cycl_e,
+                        dur_cycl_e)
 
-    #df = df_add_dist_dur(df,
-    #                dist_walk,
-    #                dur_walk,
-    #                dist_cycl_reg,
-    #                dur_cycl_reg,
-    #                dist_cycl_e,
-    #                dur_cycl_e)
+        display_data = df_transform_dist_dur(df)
 
-    #display_data = df_transform_dist_dur(df)
 
-    #display_data = distance_calculation(display_data,location,distance=radius)
 
     ##############################################################################
     ################### Displaying Data  #########################################
@@ -146,32 +146,33 @@ try:
     color = colors(subclass_check)
     #initilaizing our map
     map = folium.Map(location = location,
-                    zoom_start=14,
-                    control_scale=True)
+                zoom_start=14,
+                control_scale=True)
 
 
     #getting all the selected datapoints into the map (we only display up to 100 datapoints)
+
+
     for i in range(len(display_data)):
         folium.Marker([display_data.lat[i],
                     display_data.lon[i]],
-                    popup=f'<i> {display_data.name[i]} </i>',
+                    popup=display_data.name[i],
                     icon = folium.Icon(color = color[display_data[preferences][i]],
                                         icon = 'info-sign')).add_to(map)
 
-
-    folium.Marker([location[0],location[1]],
+        folium.Marker([location[0],location[1]],
                     popup = '<b>You</b>',
                     icon = folium.Icon(color='blue', icon='alien', prefix = 'fa')).add_to(map)
 
     #creating a radius:
     folium.Circle(
-        location=location,
-        radius=radius, #hardcoded for now
-        popup=f"{radius}m Radius", #hardcoded for now
-        color="#3186cc",
-        fill=True,
-        fill_color="#3186cc",
-    ).add_to(map)
+    location=location,
+    radius=radius, #hardcoded for now
+    popup=f"{radius}m Radius", #hardcoded for now
+    color="#3186cc",
+    fill=True,
+    fill_color="#3186cc",
+).add_to(map)
 
 
     #displaying the map:
