@@ -1,7 +1,7 @@
 import streamlit as st
 import folium
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, column_selection, distance_calculation
+from data.data_engineering import get_location, column_selection, distance_calculation, subcolumn_selection
 from data.colors import colors
 from data.distance import manhattan_distance_vectorized
 from routing.dataframe_builder import routing_limitation, df_add_dist_dur, df_transform_dist_dur, df_add_beeline, df_transform_beeline
@@ -34,15 +34,15 @@ try:
 
     walker_speed = st.selectbox(' How fast do you walk', options = ("fast", "medium", "slow"))
 
-    #def speed():
-        # if walker_speed == 'fast':
-        #     return (7000)
-        # elif walker_speed == 'medium':
-        #     return (4000)
-        # elif walker_speed == 'slow':
-        #     return (3000)
+    def speed():
+         if walker_speed == 'fast':
+             return (7000)
+         elif walker_speed == 'medium':
+             return (4000)
+         elif walker_speed == 'slow':
+             return (3000)
 
-    #time_min_km = speed()
+    time_min_km = speed()
 
     ##############################################################################
     ######### Data to be used ####################################################
@@ -69,11 +69,11 @@ try:
     subcolumn = st.multiselect('Preferences', options = (df_cleaned[preferences].unique()))
 
     #Final DataFrame, that only shows the selected subcolumns:
-    #info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
+    info_input=subcolumn_selection(df_cleaned, preferences, subcolumn)
     #st.write(info_input)
 
     #Renaming the Data to be used in the final frame:
-    #display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
+    display_data = info_input.rename(columns = {'@lon': 'lon', '@lat':'lat', 'name': 'name'})
 
     ##############################################################################
     ### Data Cleaning Step 1 - Classes ###########################################
@@ -90,16 +90,16 @@ try:
     ##############################################################################
 
     subclass_check = list(subcolumn)
-    #st.write(subclass_check)
-    #for i in range(len(subcolumn)):
-    #  subclass_check.append(subcolumn[i])
+
+    for i in range(len(subcolumn)):
+      subclass_check.append(subcolumn[i])
 
 
     t = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
     display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
 
-    #display_data = distance_calculation(display_data,location,distance=radius)
+    display_data = distance_calculation(display_data,location,distance=radius)
 
 
     distance = manhattan_distance_vectorized(location[0],location[1],display_data.lat, display_data.lon)
@@ -107,35 +107,35 @@ try:
 
     #customize
 
-    #display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
+    display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
 
-    #display_data['biking time'] = display_data.distance.apply(lambda x: (x*60)/13000)
+    display_data['biking time'] = display_data.distance.apply(lambda x: (x*60)/13000)
 
-    #display_data['E-Biking time'] = display_data.distance.apply(lambda x: (x*60)/18000)
+    display_data['E-Biking time'] = display_data.distance.apply(lambda x: (x*60)/18000)
 
-    #display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
+    display_data = subcolumn_selection(df_cleaned,preferences, subclass_check)
     #st.write(display_data)
     ##############################################################################
     ################### Getting Routes  ##########################################
     ##############################################################################
 
 
-    df = routing_limitation(display_data)
-    #st.write(df)
-    dist_walk, dur_walk, dist_cycl_reg, dur_cycl_reg, dist_cycl_e, dur_cycl_e= routing_final(df,location[0],location[1],api_key)
-    #st.write(dist_walk)
-    df = df_add_dist_dur(df,
-                    dist_walk,
-                    dur_walk,
-                    dist_cycl_reg,
-                    dur_cycl_reg,
-                    dist_cycl_e,
-                    dur_cycl_e)
+    #df = routing_limitation(display_data)
 
-    display_data = df_transform_dist_dur(df)
+    #dist_walk, dur_walk, dist_cycl_reg, dur_cycl_reg, dist_cycl_e, dur_cycl_e= routing_final(df,location[0],location[1],api_key)
+
+    #df = df_add_dist_dur(df,
+    #                dist_walk,
+    #                dur_walk,
+    #                dist_cycl_reg,
+    #                dur_cycl_reg,
+    #                dist_cycl_e,
+    #                dur_cycl_e)
+
+    #display_data = df_transform_dist_dur(df)
 
     #display_data = distance_calculation(display_data,location,distance=radius)
-    #st.write(display_data)
+
     ##############################################################################
     ################### Displaying Data  #########################################
     ##############################################################################
