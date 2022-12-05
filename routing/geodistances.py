@@ -1,5 +1,5 @@
 import requests
-from geopy.distance import geodesic
+#from geopy.distance import geodesic
 import time
 import requests
 
