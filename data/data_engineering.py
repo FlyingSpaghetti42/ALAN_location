@@ -152,7 +152,7 @@ def filter_columns(df, column_name):
                     'Amenity', 'Sports']
     list_columns.remove(column_name)
     df.drop(columns = list_columns, inplace = True)
-    df = df[df[column_selection] != '']
+    df = df[df[column_name] != '']
     df.reset_index(inplace=True, drop = True)
     return df
 
@@ -187,15 +187,15 @@ def distance_calculation(df,location,distance=2000):
     '''
     Function calculates the distance from the center
     '''
-    df['distance']= df.apply(lambda df: geodesic(location, (df.lat,df.lon)).m, axis=1)
-    return df[df['distance']<distance].sort_values(by=["distance"]).reset_index(drop=True)
+    df['Linear Distance']= df.apply(lambda df: geodesic(location, (df.Latitude,df.Longitude)).m, axis=1)
+    return df[df['Linear Distance']<distance].sort_values(by=["Linear Distance"]).reset_index(drop=True)
 
 if __name__ == '__main__':
     address=input("please enter the address:")
     preference=input ('select yor interests ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"):')
     location=get_location(address)
     # df=get_complete_data(location)
-    df_cleaned=column_selection(location, preference)
+    #df_cleaned=column_selection(location, preference)
     # subcolumn=input('select your sub interests:')
     # df_final=subcolumn_selection(df_cleaned, preference,subcolumn)
-    print(df_cleaned.head(20))
+    #print(df_cleaned.head(20))
