@@ -27,7 +27,6 @@ st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 
 # Street Input:
 address = st.text_input('Adress', 'Please Input the Adress')
-
 #preferences, the User is able to choose from:
 preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
 mode = st.selectbox(' Choose the mode', options = ("bikeing", "walking", "driving"))
