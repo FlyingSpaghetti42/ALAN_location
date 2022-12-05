@@ -2,13 +2,12 @@ import streamlit as st
 import folium
 from folium import plugins
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
-from data.colors import colors
-from data.distance import manhattan_distance_vectorized
-from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
-from routing.geodistances import routing_final
-from routing.utils import speed
-from routing.geodistances import get_isochrone
+from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
+from ALAN.data.colors import colors
+from ALAN.data.distance import manhattan_distance_vectorized
+from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
+from ALAN.routing.geodistances import routing_final, get_isochrone
+from ALAN.routing.utils import speed
 
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 

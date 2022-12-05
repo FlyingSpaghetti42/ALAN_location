@@ -30,9 +30,11 @@ def get_complete_data(location, radius=2000):
     [out:csv(
         ::id, amenity, shop, office, highway, public_transport, tourism, sport,name, ::lat, ::lon, 'contact:phone','contact:website', 'addr:city','addr:street','addr:housenumber',
         'addr:postcode', 'addr:suburb', 'addr:country'
-      )];
+        )];
     (node(around:{radius},{location[0]},{location[1]});
-    );
+     way(around:{radius},{location[0]},{location[1]});
+     relation(around:{radius},{location[0]},{location[1]});
+        );
     out center;
     """
     response = requests.get(overpass_url,
