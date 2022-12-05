@@ -158,25 +158,25 @@ def filter_columns(df, column_name):
     df.reset_index(inplace=True, drop = True)
     return df
 
-#def column_selection(location,column_name):
-#    '''
-#    Function cleans the data based on column selection
-#    '''
-#    df=get_complete_data(location)
-#    list_columns=[ "shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"]
-#    list_address=['name','addr:street','addr:housenumber','addr:suburb','addr:city','addr:postcode',
-#                  'addr:country','contact:phone','contact:website']
-#    df_amenity= df.dropna(subset=[column_name, 'name'])
-#    df_amenity.rename(columns={"@lon":"longitude", "@lat":"latitude"}, inplace=True)
-#    list_columns.remove(column_name)
-#    df_amenity.drop(columns=list_columns, inplace=True)
-#    df_amenity.fillna(" ",inplace=True)
-#    df_amenity["address"]=df_amenity[list_address].astype(str).apply(",".join, axis=1)
-#    df_amenity["address"]=df_amenity["address"].apply(lambda x: x.strip(', '))
-#    list_address.remove('name')
-#    df_amenity.drop(columns=list_address, inplace=True)
-#    df_amenity.reset_index(inplace=True, drop=True)
-#    return df_amenity
+def format_subclass_traffic(df):
+    '''
+    Structure Traffic column to make results more tractable
+
+    Function renames entries and deletes duplicates (e.g. if bus station on both sides of road)
+
+    Should not be applied to the whole dataframe
+
+    Input: Dataframe already filtered
+    '''
+    # rename stations
+    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Stop position','Bus stop'))
+    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Bus stop platform','Bus stop'))
+    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Station','Train station'))
+
+    # next, get rid of duplicate stations
+    df['Location Name'] = df['Location Name'].drop_duplicates()
+    df = df.dropna().reset_index(drop=True)
+    return df
 
 
 def subcolumn_selection(df, column_name,subcolumn_name):
