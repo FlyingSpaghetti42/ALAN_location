@@ -4,9 +4,6 @@ from ALAN.routing.geodistances import distance_beeline
 from ALAN.routing.utils import transform_km, transform_min
 
 def df_preprocess(df):
-    df = df.drop(columns=['Unnamed: 0','@id'])
-    df = df.replace(np.nan, 'Not Available')
-    df = df.rename(columns={'@lat':'lat', '@lon':'lon'})
     df = df[0:12]
     return df
 
