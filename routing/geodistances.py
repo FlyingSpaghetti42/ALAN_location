@@ -1,5 +1,5 @@
 import requests
-from geopy.distance import geodesic
+#from geopy.distance import geodesic
 import time
 import requests
 
@@ -181,7 +181,7 @@ def routing_final(df,
         dur_cycl_e =[]
 
         for i in range((df.shape[0])):
-            lat_end, lon_end = float(df.loc[i,'lat']), float(df.loc[i,'lon'])
+            lat_end, lon_end = float(df.loc[i,'Latitude']), float(df.loc[i,'Longitude'])
             request = dist_dur_all_modes(lat_start,lon_start,lat_end,lon_end,api_key)
             dist_walk.append(request[0][0])
             dur_walk.append(request[0][1])
@@ -202,7 +202,7 @@ def routing_final(df,
         if count % 40 == 0:
             print("Everything's fine, I just need to recharge my batteries")
             time.sleep(61)
-        lat_end, lon_end = float(df.loc[i,'lat']), float(df.loc[i,'lon'])
+        lat_end, lon_end = float(df.loc[i,'Latitude']), float(df.loc[i,'Longitude'])
         request = dist_dur_all_modes(lat_start,lon_start,lat_end,lon_end,api_key,mode)
         dist_mode.append(request[0])
         dur_mode.append(request[1])

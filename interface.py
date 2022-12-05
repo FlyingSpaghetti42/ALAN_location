@@ -2,7 +2,7 @@ import streamlit as st
 import folium
 from folium import plugins
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, column_selection, distance_calculation
+from data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
 from data.colors import colors
 from data.distance import manhattan_distance_vectorized
 from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
@@ -28,7 +28,9 @@ st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 # Street Input:
 address = st.text_input('Adress', 'Please Input the Adress')
 #preferences, the User is able to choose from:
-preferences = st.selectbox(' Classes', options = ("shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"))
+preferences = st.selectbox(' Classes', options = ('Shopping', 'Office',
+                                                  'Traffic','Tourism',
+                                                  'Amenity', 'Sports'))
 mode = st.selectbox(' Choose the mode', options = ("bikeing", "walking", "driving"))
 # Radius Selector:
 radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
@@ -48,14 +50,20 @@ location=get_location(address)
 
 # DataFrame for our class selection:
 if address  != 'Please Input the Adress':
-    @st.cache()
+    #@st.cache()
     def first():
-        return column_selection(location, preferences)
+        return data_cleaning(address, radius=2000)
 
-    df_cleaned = first()
+    data = first()
+
+    st.write(data)
+    df_cleaned = filter_columns(data, preferences)
 
 else:
-    df_cleaned = 0
+    data = 0
+
+# Cat Selector:
+
 
 
 # Subcat Selector:
@@ -81,22 +89,22 @@ for i in range(len(subcolumn)):
     subclass_check.append(subcolumn[i])
 
 
-t = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
+display_data = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
-display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
+#display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
 
 if checker == False:
     display_data = distance_calculation(display_data,location,distance=radius)
 
-    distance = manhattan_distance_vectorized(location[0],location[1],display_data.lat, display_data.lon)
+    distance = manhattan_distance_vectorized(location[0],location[1],display_data.Latitude, display_data.Longitude)
 
     #customize
 
-    display_data['walking time'] = display_data.distance.apply(lambda x: (x*60)/time_min_km)
+    display_data['Walking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/time_min_km)
 
-    display_data['biking time'] = display_data.distance.apply(lambda x: (x*60)/13000)
+    display_data['Biking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/13000)
 
-    display_data['Car Travel time'] = display_data.distance.apply(lambda x: (x*60)/18000)
+    display_data['Car travel time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/18000)
 
 ##############################################################################
 ################### Getting Routes  ##########################################
@@ -147,11 +155,11 @@ for i in range(len(display_data)):
     <table>
         <tr>
             <th>Name</th>
-            <td> {display_data['name'][i]} </td>
+            <td> {display_data['Location Name'][i]} </td>
         </tr>
         <tr>
             <th>Adress</th>
-            <td>{display_data['address'][i]}</td>
+            <td>{display_data['Address'][i]}</td>
         </tr>
         <tr>
             <th>Amenity</th>
@@ -159,17 +167,17 @@ for i in range(len(display_data)):
         </tr>
         <tr>
             <th> Distance </th>
-            <td>{round(display_data['distance'][i],2)} metres</td>
+            <td>{round(display_data['Linear Distance'][i],2)} metres</td>
         </tr>
         <tr>
             <th> Walking Time </th>
-            <td>{round(display_data['walking time'][i],2)} minutes </td>
+            <td>{round(display_data['Walking time'][i],2)} minutes </td>
         </tr>
     </table>
     </table>
     </p>'''
-    folium.Marker([display_data.lat[i],
-                display_data.lon[i]],
+    folium.Marker([display_data.Latitude[i],
+                display_data.Longitude[i]],
                 popup = folium.Popup(folium.IFrame(html=html, width=500, height=200), max_width=2000, max_height=500),
                 icon = folium.Icon(color = color[display_data[preferences][i]],
                                     icon = 'info-sign')).add_to(map)
@@ -229,9 +237,9 @@ st_folium.folium_static(map, width = 1600, height = 1000)
 
 #def color_coding(df):
 #    return ['background-color:red'] * len(
-#        df) if df.lon == loc
+#        df) if df.Longitude == loc
 #
-#    if loc == (display_data.lon , display_data.lat):
+#    if loc == (display_data.Longitude , display_data.Latitude):
 #        return ['background-color:green']
 #    else: pass
 
