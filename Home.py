@@ -13,10 +13,7 @@ from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_du
 from ALAN.routing.geodistances import routing_final, get_isochrone
 from ALAN.routing.utils import speed, transform_km, transform_min
 
-<<<<<<< HEAD:Home.py
 
-=======
->>>>>>> 87d2194172ecba10f20220897ac723d23c57a0ef:interface.py
 api_key = os.environ.get('API_KEY')
 
 #try:
