@@ -3,6 +3,8 @@ import folium
 import os
 from folium import plugins
 import streamlit_folium as st_folium
+from streamlit_option_menu import option_menu
+
 from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns,format_subclass_transport
 from ALAN.data.dash_board_basic import important_features, heat_map
 from ALAN.data.colors import colors
@@ -11,7 +13,7 @@ from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_du
 from ALAN.routing.geodistances import routing_final, get_isochrone
 from ALAN.routing.utils import speed, transform_km, transform_min
 
-#api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
+
 api_key = os.environ.get('API_KEY')
 
 #try:
@@ -22,10 +24,12 @@ api_key = os.environ.get('API_KEY')
 #defining the map layout:
 st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 
+st.markdown("# ALAN-Automated-Location-Analysis")
+st.sidebar.header("Home")
+
 ##############################################################################
 ######### Query Input #########################################################
 ##############################################################################
-st.title('ALAN - Automated Location Analysis')
 
 # Street Input:
 address = st.text_input('Adress', 'Please Input the Adress')
@@ -251,10 +255,10 @@ st_folium.folium_static(map, width = 2140, height = 1000)
 #    else: pass
 
 ##############################################################################
-################### Displaying Dataframe and Download Option  ################
+################### Displaying Dataframes and Download Option  ################
 ##############################################################################
 
-# before displaying dataframe, transform the distance column
+# before displaying dataframes, transform the distance column
 display_data['Linear Distance'] = display_data['Linear Distance'].apply(lambda x: transform_km(x, if_m=True))
 
 # display dataframe with the distance and duration calculations
@@ -275,10 +279,18 @@ st.download_button(
    "text/csv",
    key='download-csv-routing'
 )
+
+# Display another dataframe, which contains the semi-processed data including the linear distance
 st.subheader('Table 2: Semi-processed Location Data')
 st.markdown('The table includes all classes, however, without routing information, as well as with only limited preprocessing.')
-st.dataframe(data, width = 2140)
-csv_all_data = convert_df(display_data)
+
+## Add the linear distance column (create copy of df just to be sure)
+#data_cp = data.copy()
+data_copy = distance_calculation(data_copy,location,distance=radius)
+data_copy['Linear Distance'] = data_copy['Linear Distance'].apply(lambda x: transform_km(x, if_m=True))
+
+st.dataframe(data_copy, width = 2140)
+csv_all_data = convert_df(data_copy)
 
 st.download_button(
    "Press to Download",
@@ -297,7 +309,7 @@ st.download_button(
 ## Add st.cache
 st.subheader('The following table displays the number of selected features available in the queried area')
 impo_df = important_features(location, radius = 2000)
-st.dataframe(impo_df, width = 2140)
+st.dataframe(impo_df, width = 1000)
 
 # display display_data as heatmap:
 # LORENZ: Manage to Display Data
@@ -306,3 +318,17 @@ display_map = heat_map(display_data, location)
 st_folium.folium_static(display_map, width = 2140, height = 1000)
 
 # historic data:
+
+
+#with st.set_page_config:
+#    selected = option_menu(
+#        menu_title = None,
+#        options = sorted(["Features","About"],reverse=True))
+#
+#
+#    # if selected == "Home":
+#    #     st.title(f"you have selected {selected}")
+#    if selected == "Features":
+#        st.title(f"you have selected {selected}")
+#    if selected == "About":
+#        st.title(f"you have selected {selected}")
