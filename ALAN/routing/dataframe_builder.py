@@ -5,14 +5,15 @@ from ALAN.routing.utils import transform_km, transform_min
 
 def df_add_dist_dur(df,
                     dist_mode,
-                    dur_mode):
-    df['dist_mode'] = dist_mode
-    df['dur_mode'] = dur_mode
+                    dur_mode,
+                    mode):
+    df[f'Distance {mode}'] = dist_mode
+    df[f'Duration {mode}'] = dur_mode
     return df
 
-def df_transform_dist_dur(df):
-    df['dist_mode'] = df['dist_mode'].apply(lambda x: transform_km(x))
-    df['dur_mode'] = df['dur_mode'].apply(lambda x: transform_min(x))
+def df_transform_dist_dur(df,mode):
+    df[f'Distance {mode}'] = df[f'Distance {mode}'].apply(lambda x: transform_km(x))
+    df[f'Duration {mode}'] = df[f'Duration {mode}'].apply(lambda x: transform_min(x))
 #    df['dist_cycl_reg'] = df['dist_cycl_reg'].apply(lambda x: transform_km(x))
 #    df['dur_cycl_reg'] = df['dur_cycl_reg'].apply(lambda x: transform_min(x))
 #    df['dist_cycl_e'] = df['dist_cycl_e'].apply(lambda x: transform_km(x))

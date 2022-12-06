@@ -30,9 +30,11 @@ def get_complete_data(location, radius=2000):
     [out:csv(
         ::id, amenity, shop, office, highway, public_transport, tourism, sport,name, ::lat, ::lon, 'contact:phone','contact:website', 'addr:city','addr:street','addr:housenumber',
         'addr:postcode', 'addr:suburb', 'addr:country'
-      )];
+        )];
     (node(around:{radius},{location[0]},{location[1]});
-    );
+     way(around:{radius},{location[0]},{location[1]});
+     relation(around:{radius},{location[0]},{location[1]});
+        );
     out center;
     """
     response = requests.get(overpass_url,
@@ -84,8 +86,8 @@ def data_cleaning(address:str, radius=2000):
     list_address.remove('name')
     df.drop(columns = list_address, inplace = True)
 
-    # Create new column merging highway and traffic category
-    df['Traffic'] = df[['highway',
+    # Create new column merging highway and Transport category
+    df['Transport'] = df[['highway',
                             'public_transport']].astype(str).apply(",".join, axis=1)
     ## remove redundant columns
     df.drop(columns = ['highway', 'public_transport', '@id'], inplace = True)
@@ -117,7 +119,7 @@ def data_cleaning(address:str, radius=2000):
     df['Address'] = df['Address'].apply(lambda x: x.replace(',',' '))
 
     ## String formatting of Subclass Names:
-    cols = ['Amenity', 'Traffic', 'Shopping',
+    cols = ['Amenity', 'Transport', 'Shopping',
             'Office', 'Tourism', 'Sports']
     ### clear commas
     df[cols] = df[cols].apply(lambda x: x.str.replace(',',' '))
@@ -131,7 +133,7 @@ def data_cleaning(address:str, radius=2000):
     # rearrange columns
     df = df.reindex(columns=['Location Name','Address','Website','Phone Number',
                              'Latitude', 'Longitude',
-                             'Amenity', 'Traffic',
+                             'Amenity', 'Transport',
                              'Shopping', 'Office',
                              'Tourism', 'Sports'])
 
@@ -144,11 +146,11 @@ def filter_columns(df, column_name):
     Replaces the column_selection function
 
     Filters the preprocessed DataFrame to only include the category chosen
-    (Shopping Facility, Office, Traffic, Public Transport, Tourism, Amenity,
+    (Shopping Facility, Office, Transport, Public Transport, Tourism, Amenity,
     Sport Facility)
     '''
     list_columns = ['Shopping',
-                    'Office', 'Traffic','Tourism',
+                    'Office', 'Transport','Tourism',
                     'Amenity', 'Sports']
     list_columns.remove(column_name)
     df.drop(columns = list_columns, inplace = True)
@@ -156,25 +158,28 @@ def filter_columns(df, column_name):
     df.reset_index(inplace=True, drop = True)
     return df
 
-#def column_selection(location,column_name):
-#    '''
-#    Function cleans the data based on column selection
-#    '''
-#    df=get_complete_data(location)
-#    list_columns=[ "shop", "office", "highway", "public_transport", "tourism", "amenity", "sport"]
-#    list_address=['name','addr:street','addr:housenumber','addr:suburb','addr:city','addr:postcode',
-#                  'addr:country','contact:phone','contact:website']
-#    df_amenity= df.dropna(subset=[column_name, 'name'])
-#    df_amenity.rename(columns={"@lon":"longitude", "@lat":"latitude"}, inplace=True)
-#    list_columns.remove(column_name)
-#    df_amenity.drop(columns=list_columns, inplace=True)
-#    df_amenity.fillna(" ",inplace=True)
-#    df_amenity["address"]=df_amenity[list_address].astype(str).apply(",".join, axis=1)
-#    df_amenity["address"]=df_amenity["address"].apply(lambda x: x.strip(', '))
-#    list_address.remove('name')
-#    df_amenity.drop(columns=list_address, inplace=True)
-#    df_amenity.reset_index(inplace=True, drop=True)
-#    return df_amenity
+def format_subclass_transport(df):
+    '''
+    Structure Traffic column to make results more tractable
+
+    Function renames entries and deletes duplicates (e.g. if bus station on both sides of road)
+
+    Should not be applied to the whole dataframe
+
+    Input: Dataframe already filtered
+    '''
+    # rename stations
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Stop position','Bus stop'))
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Bus stop platform','Bus stop'))
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Station','Train station'))
+
+    # next, get rid of duplicate stations
+    df = df.drop_duplicates(subset=['Location Name','Transport']).reset_index(drop=True)
+
+    # only retain specified columns:
+    categories = ['Bus stop','Train station']
+    df = df[df.Transport.isin(categories)]
+    return df
 
 
 def subcolumn_selection(df, column_name,subcolumn_name):
@@ -187,7 +192,7 @@ def distance_calculation(df,location,distance=2000):
     '''
     Function calculates the distance from the center
     '''
-    df['Linear Distance']= df.apply(lambda df: geodesic(location, (df.Latitude,df.Longitude)).m, axis=1)/1000
+    df['Linear Distance']= df.apply(lambda df: geodesic(location, (df.Latitude,df.Longitude)).m, axis=1)
     return df[df['Linear Distance']<distance].sort_values(by=["Linear Distance"]).reset_index(drop=True)
 
 if __name__ == '__main__':

@@ -4,6 +4,5 @@ pydeck
 streamlit
 folium
 streamlit-folium
-io
 requests
 geopy
