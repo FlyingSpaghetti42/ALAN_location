@@ -6,6 +6,6 @@ folium
 streamlit-folium
 requests
 geopy
-matplotlib.pyplot
+matplotlib
 bs4
 warnings
