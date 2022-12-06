@@ -31,3 +31,4 @@ def colors(subclass_check):
                 subclass_check[4] : 'blue'
                 }
     return color
+
