@@ -3,8 +3,6 @@ import folium
 import os
 from folium import plugins
 import streamlit_folium as st_folium
-from streamlit_option_menu import option_menu
-
 from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns,format_subclass_transport
 from ALAN.data.dash_board_basic import important_features, heat_map
 from ALAN.data.colors import colors
