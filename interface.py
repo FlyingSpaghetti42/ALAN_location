@@ -2,13 +2,13 @@ import streamlit as st
 import folium
 from folium import plugins
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
-from data.colors import colors
-from data.distance import manhattan_distance_vectorized
-from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
-from routing.geodistances import routing_final
-from routing.utils import speed
-from routing.geodistances import get_isochrone
+from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
+from ALAN.data.colors import colors
+from ALAN.data.distance import manhattan_distance_vectorized
+from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
+from ALAN.routing.geodistances import routing_final
+from ALAN.routing.utils import speed, transform_min
+from ALAN.routing.geodistances import get_isochrone
 
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 
@@ -56,7 +56,6 @@ if address  != 'Please Input the Adress':
 
     data = first()
 
-    st.write(data)
     df_cleaned = filter_columns(data, preferences)
 
 else:
@@ -93,19 +92,30 @@ display_data = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
 #display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
 
+routing_dict = {"bikeing": 'Bike',
+                "walking": 'Foot',
+                "driving": 'Car'
+                }
+
+start_lat = location[0]
+start_lon = location[1]
+
 if checker == False:
     display_data = distance_calculation(display_data,location,distance=radius)
 
     distance = manhattan_distance_vectorized(location[0],location[1],display_data.Latitude, display_data.Longitude)
 
     #customize
+    display_data['Distance Approx'] = distance
 
-    display_data['Walking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/time_min_km)
+    display_data['Walking time'] = display_data['Distance Approx'].apply(lambda x: (x*60)/time_min_km)
+    display_data['Walking time'] = display_data['Walking time'].apply(lambda x: round(x,4))
 
-    display_data['Biking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/13000)
+    display_data['Biking time'] = display_data['Distance Approx'].apply(lambda x: (x*60)/13)
+    display_data['Biking time'] = display_data['Biking time'].apply(lambda x: round(x),4)
 
-    display_data['Car travel time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/18000)
-
+    display_data['Car travel time'] = display_data['Distance Approx'].apply(lambda x: (x*60)/18)
+    display_data['Car travel time'] = display_data['Car travel time'].apply(lambda x: round(x),4)
 ##############################################################################
 ################### Getting Routes  ##########################################
 ##############################################################################
@@ -116,8 +126,10 @@ else:
 
     df = df_add_dist_dur(df, dist_mode, dur_mode)
 
-    display_data = df_transform_dist_dur(df)
-
+    display_data = df_transform_dist_dur(df).rename(columns = {'dist_mode': 'Distances',
+                                                                'dur_mode': f'Duration ({routing_dict[mode]})'
+                                                                })
+    st.write(display_data)
 
 
 ##############################################################################
@@ -146,36 +158,74 @@ border-collapse: collapse;
 }
 </style>
 '''
-
 for i in range(len(display_data)):
+    try:
+        html = f'''
+        {html_style}
+        <p style="font-family: Arial">
+        <table>
+            <tr>
+                <th>Name</th>
+                <td> {display_data['Location Name'][i]} </td>
+            </tr>
+            <tr>
+                <th>Adress</th>
+                <td>{display_data['Address'][i]}</td>
+            </tr>
+                <tr>
+                <th>Phone Number</th>
+                <td>{display_data['Phone Number'][i]}</td>
+            </tr>
+            <tr>
+                <th>Amenity</th>
+                <td>{display_data[preferences][i]}</td>
+            </tr>
+            <tr>
+                <th> Distance </th>
+                <td>{display_data['Distance Approx'][i]} metres</td>
+            </tr>
+            <tr>
+                <th> Walking Time </th>
+                <td>{display_data['Walking time'][i]} minutes </td>
+            </tr>
+        </table>
+        </table>
+        </p>'''
+    except:
+           html = f'''
+        {html_style}
+        <p style="font-family: Arial">
+        <table>
+            <tr>
+                <th>Name</th>
+                <td> {display_data['Location Name'][i]} </td>
+            </tr>
+            <tr>
+                <th>Adress</th>
+                <td>{display_data['Address'][i]}</td>
+            </tr>
+            </tr>
+            <tr>
+                <th>Phone Number</th>
+                <td>{display_data['Phone Number'][i]}</td>
+            </tr>
+            <tr>
+                <th>Amenity</th>
+                <td>{display_data[preferences][i]}</td>
+            </tr>
+            <tr>
+                <th> Distance </th>
+                <td>{display_data['Distances'][i]} metres</td>
+            </tr>
+            <tr>
+                <th> Duration ({routing_dict[mode]}) </th>
+                <td> {display_data[f'Duration ({routing_dict[mode]})'][i]} </td>
+            </tr>
+        </table>
+        </table>
+        </p>'''
 
-    html = f'''
-    {html_style}
-    <p style="font-family: Arial">
-    <table>
-        <tr>
-            <th>Name</th>
-            <td> {display_data['Location Name'][i]} </td>
-        </tr>
-        <tr>
-            <th>Adress</th>
-            <td>{display_data['Address'][i]}</td>
-        </tr>
-        <tr>
-            <th>Amenity</th>
-            <td>{display_data[preferences][i]}</td>
-        </tr>
-        <tr>
-            <th> Distance </th>
-            <td>{round(display_data['Linear Distance'][i],2)} metres</td>
-        </tr>
-        <tr>
-            <th> Walking Time </th>
-            <td>{round(display_data['Walking time'][i],2)} minutes </td>
-        </tr>
-    </table>
-    </table>
-    </p>'''
+
     folium.Marker([display_data.Latitude[i],
                 display_data.Longitude[i]],
                 popup = folium.Popup(folium.IFrame(html=html, width=500, height=200), max_width=2000, max_height=500),

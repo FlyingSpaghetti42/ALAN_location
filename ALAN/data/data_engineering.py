@@ -187,7 +187,7 @@ def distance_calculation(df,location,distance=2000):
     '''
     Function calculates the distance from the center
     '''
-    df['Linear Distance']= df.apply(lambda df: geodesic(location, (df.Latitude,df.Longitude)).m, axis=1)
+    df['Linear Distance']= df.apply(lambda df: geodesic(location, (df.Latitude,df.Longitude)).m, axis=1)/1000
     return df[df['Linear Distance']<distance].sort_values(by=["Linear Distance"]).reset_index(drop=True)
 
 if __name__ == '__main__':

@@ -16,6 +16,3 @@ def manhattan_distance_vectorized(start_lat, start_lon, end_lat, end_lon):
     manhattan_km = manhattan_rad * earth_radius *1000
 
     return manhattan_km
-
-
-
