@@ -86,8 +86,8 @@ def data_cleaning(address:str, radius=2000):
     list_address.remove('name')
     df.drop(columns = list_address, inplace = True)
 
-    # Create new column merging highway and traffic category
-    df['Traffic'] = df[['highway',
+    # Create new column merging highway and Transport category
+    df['Transport'] = df[['highway',
                             'public_transport']].astype(str).apply(",".join, axis=1)
     ## remove redundant columns
     df.drop(columns = ['highway', 'public_transport', '@id'], inplace = True)
@@ -119,7 +119,7 @@ def data_cleaning(address:str, radius=2000):
     df['Address'] = df['Address'].apply(lambda x: x.replace(',',' '))
 
     ## String formatting of Subclass Names:
-    cols = ['Amenity', 'Traffic', 'Shopping',
+    cols = ['Amenity', 'Transport', 'Shopping',
             'Office', 'Tourism', 'Sports']
     ### clear commas
     df[cols] = df[cols].apply(lambda x: x.str.replace(',',' '))
@@ -133,7 +133,7 @@ def data_cleaning(address:str, radius=2000):
     # rearrange columns
     df = df.reindex(columns=['Location Name','Address','Website','Phone Number',
                              'Latitude', 'Longitude',
-                             'Amenity', 'Traffic',
+                             'Amenity', 'Transport',
                              'Shopping', 'Office',
                              'Tourism', 'Sports'])
 
@@ -146,11 +146,11 @@ def filter_columns(df, column_name):
     Replaces the column_selection function
 
     Filters the preprocessed DataFrame to only include the category chosen
-    (Shopping Facility, Office, Traffic, Public Transport, Tourism, Amenity,
+    (Shopping Facility, Office, Transport, Public Transport, Tourism, Amenity,
     Sport Facility)
     '''
     list_columns = ['Shopping',
-                    'Office', 'Traffic','Tourism',
+                    'Office', 'Transport','Tourism',
                     'Amenity', 'Sports']
     list_columns.remove(column_name)
     df.drop(columns = list_columns, inplace = True)
@@ -158,7 +158,7 @@ def filter_columns(df, column_name):
     df.reset_index(inplace=True, drop = True)
     return df
 
-def format_subclass_traffic(df):
+def format_subclass_transport(df):
     '''
     Structure Traffic column to make results more tractable
 
@@ -169,13 +169,16 @@ def format_subclass_traffic(df):
     Input: Dataframe already filtered
     '''
     # rename stations
-    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Stop position','Bus stop'))
-    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Bus stop platform','Bus stop'))
-    df.loc[:,'Traffic'] = df.Traffic.apply(lambda x: x.replace('Station','Train station'))
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Stop position','Bus stop'))
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Bus stop platform','Bus stop'))
+    df.loc[:,'Transport'] = df.Transport.apply(lambda x: x.replace('Station','Train station'))
 
     # next, get rid of duplicate stations
-    df['Location Name'] = df['Location Name'].drop_duplicates()
-    df = df.dropna().reset_index(drop=True)
+    df = df.drop_duplicates(subset=['Location Name','Transport']).reset_index(drop=True)
+
+    # only retain specified columns:
+    categories = ['Bus stop','Train station']
+    df = df[df.Transport.isin(categories)]
     return df
 
 
