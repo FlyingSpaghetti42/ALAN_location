@@ -304,31 +304,25 @@ st.download_button(
 ##############################################################################
 ################### Kumar - Historic and Heatmap  ############################
 ##############################################################################
+# get important features
+@st.cache()
+def get_important_features(location, radius=2000):
+    if location is not ():
+        impo_df = important_features(location, radius = radius)
+        return impo_df
+    else:
+        return 'The table will show once a location is inputted'
+data = get_important_features(location, radius=2000)
 
-# important features:
-## Add st.cache
-st.subheader('The following table displays the number of selected features available in the queried area')
-impo_df = important_features(location, radius = 2000)
-st.dataframe(impo_df, width = 1000)
+if type(data) != str:
+    st.subheader('The following table displays the number of selected features available in the queried area')
+    st.dataframe(data,width=1000)
+else:
+    st.write(data)
 
 # display display_data as heatmap:
-# LORENZ: Manage to Display Data
 display_map = heat_map(display_data, location)
 #st.map(display_map)
 st_folium.folium_static(display_map, width = 2140, height = 1000)
 
 # historic data:
-
-
-#with st.set_page_config:
-#    selected = option_menu(
-#        menu_title = None,
-#        options = sorted(["Features","About"],reverse=True))
-#
-#
-#    # if selected == "Home":
-#    #     st.title(f"you have selected {selected}")
-#    if selected == "Features":
-#        st.title(f"you have selected {selected}")
-#    if selected == "About":
-#        st.title(f"you have selected {selected}")
