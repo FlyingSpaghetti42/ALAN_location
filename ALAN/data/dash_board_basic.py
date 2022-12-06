@@ -47,7 +47,10 @@ def time_based_stats(location, preference, subpreference:str ,radius=2000):
             [out:xml][timeout:2400];
             (
             node[{preference}={subpreference}](around:{radius},{location[0]}, {location[1]});
+            way(around:{radius},{location[0]},{location[1]});
+            relation(around:{radius},{location[0]},{location[1]});
             );
+            out center;
             out count;'''
         response = requests.get(overpass_url, params={'data': overpass_query})
         return ([2022], [int(BeautifulSoup(response.text).select("tag")[0]["v"])])

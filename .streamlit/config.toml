@@ -19,3 +19,10 @@ textColor = "#6e7074" # grey
 # Font family (serif | sans serif | mono) for the page. Will not impact code areas.
 # Default: "sans serif"
 font = "sans serif"
+<<<<<<< HEAD
+=======
+
+#port = 8000
+
+#address = 0.0.0.0
+>>>>>>> 1eeae676d3ca52db2f7bfdc446d3a1d60309b021

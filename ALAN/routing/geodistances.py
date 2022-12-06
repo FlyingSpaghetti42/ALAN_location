@@ -208,6 +208,7 @@ def routing_final(df,
         dur_mode.append(request[1])
     return dist_mode, dur_mode
 
+#def get_beeline(df,location)
 
 def get_isochrone(mode:str,
                   locations, # at centre of isochrone (e.g.[[13.38895,52.515115]])

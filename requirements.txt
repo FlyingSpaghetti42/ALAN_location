@@ -6,3 +6,5 @@ folium
 streamlit-folium
 requests
 geopy
+matplotlib
+bs4
