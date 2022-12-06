@@ -13,48 +13,37 @@ from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_du
 from ALAN.routing.geodistances import routing_final, get_isochrone
 from ALAN.routing.utils import speed, transform_km, transform_min
 
-#api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 api_key = os.environ.get('API_KEY')
 
 #try:
-##############################################################################
-######### Map Layout #########################################################
-##############################################################################
-
-#defining the map layout:
-st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 
 ##############################################################################
-######### Query Input #########################################################
+######### Layout #############################################################
 ##############################################################################
+
+
+# Defining the webpage items (map, dataframes, etc.) layout:
+st.set_page_config(page_title='ALAN',
+                   layout="wide",
+                   page_icon = 'ALAN/data/logo_header.png')
+
+# Title of the Website:
 st.title('ALAN - Automated Location Analysis')
 
+st.markdown('___')
+
+##############################################################################
+######### Query Input ########################################################
+##############################################################################
+
 # Street Input:
-address = st.text_input('Adress', 'Please Input the Adress')
-#preferences, the User is able to choose from:
-preferences = st.selectbox(' Classes', options = ('Shopping', 'Office',
-                                                  'Transport','Tourism',
-                                                  'Amenity', 'Sports'))
-mode = st.selectbox(' Choose the mode', options = ("bikeing", "walking", "driving"))
-# Radius Selector:
-radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
+address = st.text_input('Adress', 'Please enter Adress')
 
-walker_speed = st.selectbox(' How fast do you walk', options = ("fast", "medium", "slow"))
-
-checker = st.checkbox('Routing',)
-
-time_min_km = speed(walker_speed)
-
-##############################################################################
-######### Data to be used ####################################################
-##############################################################################
-
-#function that gets the location data:
+st.markdown('___')
+# Function that gets the lat and lon of the Adress used
 location=get_location(address)
 
-# DataFrame for our class selection:
-if address  != 'Please Input the Adress':
-    # WHY IS THIS WRITTEN THIS WAY?
+if address  != 'Please enter Adress':
     @st.cache()
     def get_dataframe(address, radius=2000):
         return data_cleaning(address, radius=radius)
@@ -63,6 +52,23 @@ if address  != 'Please Input the Adress':
     data_copy = data.copy()
     #st.write(data)
 
+elif address  == 'Please enter Adress':
+    pass
+
+else:
+    st.write('The address you entered is invalid. Please enter a valid address')
+
+
+# Preferences, the User is able to choose from:
+if address  != 'Please enter Adress':
+    preferences = st.selectbox(' Classes', options = ('Shopping', 'Office',
+                                                    'Transport','Tourism',
+                                                    'Amenity', 'Sports'))
+
+# DataFrame for our class selection:
+
+
+if address  != 'Please enter Adress':
     @st.cache()
     def select_class(df,preferences):
         if preferences == 'Transport':
@@ -73,30 +79,35 @@ if address  != 'Please Input the Adress':
         return df_cleaned
 
     df_cleaned = select_class(data_copy,preferences)
-    #st.write(df_cleaned)
-
-else:
-    data = 0
-
-# Cat Selector:
-
 
 
 # Subcat Selector:
 subcolumn = st.multiselect('Preferences', options = (df_cleaned[preferences].unique()))
 
-##############################################################################
-### Data Cleaning Step 1 - Classes ###########################################
-##############################################################################
+# Option to use the routing service
+if len(subcolumn) != 0:
+    checker = st.checkbox('Routing')
+else:
+    pass
 
-###### this checks the classes available.
-#checks_classes = df_cleaned[preferences].unique()
+# Choose the mode for the routing option (only available with routing enabled)
+if checker == True:
+    mode = st.selectbox(' Choose the mode', options = ("bikeing",
+                                                       "walking",
+                                                       "driving"))
 
-#defining the data to be displayed in the class data frame. We might be able to use subclass_data.
-#class_data = info_input[info_input[preferences].isin(checks_classes)].reset_index()
+
+# Select your walking speed (only enabled while Routing disabled)
+if checker == False:
+    walker_speed = st.selectbox(' How fast do you walk', options = ("fast", "medium", "slow"))
+    time_min_km = speed(walker_speed) # output of the function ->  walking speed in km/h
+
+# Radius of Items to be displayed:
+radius = st.slider('Select the Radius', 500, 2000, 2000, 50)
+
 
 ##############################################################################
-## Data Cleaning Step 2 - Subclasses #########################################
+## Data Cleaning Step 1 - Subclasses #########################################
 ##############################################################################
 
 subclass_check = list(subcolumn)
@@ -107,7 +118,6 @@ for i in range(len(subcolumn)):
 
 display_data = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
-#display_data = t.rename(columns = {'longitude': 'lon', 'latitude':'lat', 'name': 'name'}).reset_index()
 
 routing_dict = {"bikeing": 'Bike',
                 "walking": 'Foot',
@@ -165,7 +175,12 @@ color = colors(subclass_check)
 
 map = folium.Map(location = location,
             zoom_start=14,
-            control_scale=True)
+            control_scale=True,
+            width=1700,
+            height = 1000)
+
+minimap = plugins.MiniMap()
+map.add_child(minimap)
 
 #getting all the selected datapoints into the map (we only display up to 100 datapoints)
 #defining the html style of the boxes on the map
@@ -285,13 +300,19 @@ fmtr = "function(num) {return L.Util.formatNum(num, 3);};"
 #map pointer, checks where the position is on map:
 
 
-#loc = plugins.MousePosition(position='topright', separator=' , ',numDigits = 6,
-#              lat_formatter=fmtr, lng_formatter=fmtr).add_to(map)
-
-
-results = get_isochrone(mode, [[location[1], location[0]]], api_key)
+loc = plugins.MousePosition(position='topright', separator=' , ',numDigits = 6,
+                            lat_formatter=fmtr, lng_formatter=fmtr).add_to(map)
 
 checker_iso = st.checkbox('Isochrome',)
+
+if checker_iso == True:
+    mode = st.selectbox(' Choose the Mode', options = ("bikeing",
+                                                       "walking",
+                                                       "driving"))
+
+    results = get_isochrone(mode, [[location[1], location[0]]], api_key)
+
+
 if checker_iso == True:
     for isochrone in results['features']:
         folium.Polygon(locations=[list(reversed(coord)) for coord in isochrone['geometry']['coordinates'][0]],
