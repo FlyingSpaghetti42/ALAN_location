@@ -1,16 +1,18 @@
 import streamlit as st
 import folium
+import os
 from folium import plugins
 import streamlit_folium as st_folium
-from data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns
-from data.colors import colors
-from data.distance import manhattan_distance_vectorized
-from routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
-from routing.geodistances import routing_final
-from routing.utils import speed
-from routing.geodistances import get_isochrone
+from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns,format_subclass_transport
+from ALAN.data.dash_board_basic import important_features, heat_map
+from ALAN.data.colors import colors
+from ALAN.data.distance import manhattan_distance_vectorized
+from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_dur
+from ALAN.routing.geodistances import routing_final, get_isochrone
+from ALAN.routing.utils import speed, transform_km, transform_min
 
-api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
+#api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
+api_key = os.environ.get('API_KEY')
 
 #try:
 ##############################################################################
@@ -23,13 +25,13 @@ st.set_page_config(page_title='ALAN',layout="wide", page_icon = ':cry:')
 ##############################################################################
 ######### Query Input #########################################################
 ##############################################################################
-
+st.title('ALAN - Automated Location Analysis')
 
 # Street Input:
 address = st.text_input('Adress', 'Please Input the Adress')
 #preferences, the User is able to choose from:
 preferences = st.selectbox(' Classes', options = ('Shopping', 'Office',
-                                                  'Traffic','Tourism',
+                                                  'Transport','Tourism',
                                                   'Amenity', 'Sports'))
 mode = st.selectbox(' Choose the mode', options = ("bikeing", "walking", "driving"))
 # Radius Selector:
@@ -50,14 +52,26 @@ location=get_location(address)
 
 # DataFrame for our class selection:
 if address  != 'Please Input the Adress':
-    #@st.cache()
-    def first():
-        return data_cleaning(address, radius=2000)
+    # WHY IS THIS WRITTEN THIS WAY?
+    @st.cache()
+    def get_dataframe(address, radius=2000):
+        return data_cleaning(address, radius=radius)
+    data = get_dataframe(address)
 
-    data = first()
+    data_copy = data.copy()
+    #st.write(data)
 
-    st.write(data)
-    df_cleaned = filter_columns(data, preferences)
+    @st.cache()
+    def select_class(df,preferences):
+        if preferences == 'Transport':
+            df_cleaned = filter_columns(df, preferences)
+            df_cleaned = format_subclass_transport(df_cleaned)
+        else:
+            df_cleaned = filter_columns(df, preferences)
+        return df_cleaned
+
+    df_cleaned = select_class(data_copy,preferences)
+    #st.write(df_cleaned)
 
 else:
     data = 0
@@ -95,16 +109,17 @@ display_data = df_cleaned[df_cleaned[preferences].isin(subclass_check)]
 
 if checker == False:
     display_data = distance_calculation(display_data,location,distance=radius)
+    #display_data['Linear Distance'] = display_data['Linear Distance'].apply(lambda x: transform_km(x, True))
 
     distance = manhattan_distance_vectorized(location[0],location[1],display_data.Latitude, display_data.Longitude)
 
     #customize
 
-    display_data['Walking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/time_min_km)
+    display_data['Walking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/time_min_km).apply(lambda x: transform_min(x,if_manhattan=True))
 
-    display_data['Biking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/13000)
+    display_data['Biking time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/13000).apply(lambda x: transform_min(x,if_manhattan=True))
 
-    display_data['Car travel time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/18000)
+    display_data['Car travel time'] = display_data['Linear Distance'].apply(lambda x: (x*60)/18000).apply(lambda x: transform_min(x,if_manhattan=True))
 
 ##############################################################################
 ################### Getting Routes  ##########################################
@@ -114,9 +129,9 @@ else:
     df = distance_calculation(display_data,location,distance=radius)
     dist_mode, dur_mode= routing_final(df,location[0],location[1],api_key, mode = mode)
 
-    df = df_add_dist_dur(df, dist_mode, dur_mode)
+    df = df_add_dist_dur(df, dist_mode, dur_mode, mode)
 
-    display_data = df_transform_dist_dur(df)
+    display_data = df_transform_dist_dur(df,mode)
 
 
 
@@ -164,14 +179,6 @@ for i in range(len(display_data)):
         <tr>
             <th>Amenity</th>
             <td>{display_data[preferences][i]}</td>
-        </tr>
-        <tr>
-            <th> Distance </th>
-            <td>{round(display_data['Linear Distance'][i],2)} metres</td>
-        </tr>
-        <tr>
-            <th> Walking Time </th>
-            <td>{round(display_data['Walking time'][i],2)} minutes </td>
         </tr>
     </table>
     </table>
@@ -233,7 +240,7 @@ if checker_iso == True:
 else:
     pass
 
-st_folium.folium_static(map, width = 1600, height = 1000)
+st_folium.folium_static(map, width = 2140, height = 1000)
 
 #def color_coding(df):
 #    return ['background-color:red'] * len(
@@ -243,27 +250,59 @@ st_folium.folium_static(map, width = 1600, height = 1000)
 #        return ['background-color:green']
 #    else: pass
 
+##############################################################################
+################### Displaying Dataframe and Download Option  ################
+##############################################################################
 
+# before displaying dataframe, transform the distance column
+display_data['Linear Distance'] = display_data['Linear Distance'].apply(lambda x: transform_km(x, if_m=True))
 
-st.dataframe(display_data, width = 1600)
+# display dataframe with the distance and duration calculations
+st.subheader('Table 1: Subclass selection including distance and travel time estimates')
+st.markdown('The table shows the data as queried. If routing is not ticked, estimates are provided based on average speeds for the three modes of transport')
+st.dataframe(display_data, width = 2140)
 
 @st.experimental_memo
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-
-csv = convert_df(display_data)
+csv_routing = convert_df(display_data)
 
 st.download_button(
    "Press to Download",
-   csv,
-   "file.csv",
+   csv_routing,
+   "travel_time_query.csv",
    "text/csv",
-   key='download-csv'
+   key='download-csv-routing'
+)
+st.subheader('Table 2: Semi-processed Location Data')
+st.markdown('The table includes all classes, however, without routing information, as well as with only limited preprocessing.')
+st.dataframe(data, width = 2140)
+csv_all_data = convert_df(display_data)
+
+st.download_button(
+   "Press to Download",
+   csv_all_data,
+   "all_data.csv",
+   "text/csv",
+   key='download-csv-all'
 )
 
 
+##############################################################################
+################### Kumar - Historic and Heatmap  ############################
+##############################################################################
 
+# important features:
+## Add st.cache
+st.subheader('The following table displays the number of selected features available in the queried area')
+impo_df = important_features(location, radius = 2000)
+st.dataframe(impo_df, width = 2140)
 
-#except:
-#pass
+# display display_data as heatmap:
+# LORENZ: Manage to Display Data
+display_map = heat_map(display_data, location)
+#st.map(display_map)
+st_folium.folium_static(display_map, width = 2140, height = 1000)
+
+# historic data:
