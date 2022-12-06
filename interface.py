@@ -22,15 +22,6 @@ api_key = os.environ.get('API_KEY')
 ##############################################################################
 
 
-# Defining the webpage items (map, dataframes, etc.) layout:
-st.set_page_config(page_title='ALAN',
-                   layout="wide",
-                   page_icon = 'ALAN/data/logo_header.png')
-
-# Title of the Website:
-st.title('ALAN - Automated Location Analysis')
-
-st.markdown('___')
 
 ##############################################################################
 ######### Query Input ########################################################
