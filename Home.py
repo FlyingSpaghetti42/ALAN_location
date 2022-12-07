@@ -42,7 +42,7 @@ st.sidebar.markdown('___')
 st.title('ALAN - Automated Location Analysis')
 st.markdown('___')
 
-#try:
+
 
 # Checkboxes on the sidebar:
 
@@ -65,7 +65,9 @@ time_min_km = speed('medium')
 if checker_help == True:
     st.markdown('1. Enter the adress of the Location you want to analyze')
 
-address = st.text_input('Adress', 'Please enter Adress')
+
+address = st.text_input('Adress', 'Rudi Dutschke Straße 26', placeholder='Enter Text here')
+
 
 
 # Function that gets the lat and lon of the Adress used
@@ -114,7 +116,9 @@ if address  != 'Please enter Adress':
 
 
 # Subcategory Selection Box:
-subcolumn = st.multiselect('**Preferences**', options = (df_cleaned[preferences].unique()))
+
+subcolumn = st.multiselect('**Preferences**', options = df_cleaned[preferences].unique(),
+                                                         default= df_cleaned[preferences].unique()[0])
 
 
 # Help Info:
