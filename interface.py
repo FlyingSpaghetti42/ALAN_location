@@ -145,7 +145,7 @@ else:
 
     df = df_add_dist_dur(df, dist_mode, dur_mode, mode)
 
-    display_data = df_transform_dist_dur(df).rename(columns = {'dist_mode': 'Distances',
+    display_data = df_transform_dist_dur(df).rename(columns = {'Distance {mode}': 'Distances',
                                                                 'dur_mode': f'Duration ({routing_dict[mode]})'
                                                                 })
     #st.write(display_data)
