@@ -5,7 +5,7 @@ from folium import plugins
 import streamlit_folium as st_folium
 from decimal import Decimal
 
-
+from ALAN.public_t.public_transport import get_data
 from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns,format_subclass_transport
 from ALAN.data.dash_board_basic import important_features, heat_map
 from ALAN.data.colors import colors
@@ -32,7 +32,7 @@ st.set_page_config(page_title='ALAN',
 
 
 
-st.sidebar.header("Home")
+
 st.sidebar.markdown('___')
 st.sidebar.header("Settings")
 st.sidebar.markdown('___')
@@ -57,6 +57,9 @@ mode = 'walking'
 time_min_km = speed('medium')
 
 
+
+
+
 ##############################################################################
 ######### Query Input ########################################################
 ##############################################################################
@@ -68,10 +71,11 @@ if checker_help == True:
 
 address = st.text_input('Adress', 'Rudi Dutschke Straße 26', placeholder='Enter Text here')
 
-
+checker_pt = st.sidebar.checkbox('Nearest Public Transport')
 
 # Function that gets the lat and lon of the Adress used
 location=get_location(address)
+
 
 #This function defines the data to be used:
 if address  != 'Please enter Adress':
@@ -114,6 +118,11 @@ if address  != 'Please enter Adress':
 
     df_cleaned = select_class(data_copy,preferences)
 
+public_transport = get_data(location,address, radius=2000)
+display_tansport = public_transport[['Name', 'Distance', 'Modes of Transportation']]
+display_tansport['Distance'] = display_tansport['Distance'].apply(lambda x: transform_km(x/1000))
+
+
 
 # Subcategory Selection Box:
 
@@ -132,6 +141,9 @@ checker_iso = st.sidebar.checkbox('Isochrone',)
 
 # Option to use the built-in routing function:
 checker = st.sidebar.checkbox('Routing')
+if checker == True:
+    api_key = st.text_input('In order to use the Routing Service, please enter a Open Route Service API key')
+
 
 # Choose the mode for the routing option (only available with routing enabled)
 if checker == True or checker_iso == True:
@@ -202,20 +214,46 @@ if checker == False:
                             lambda x: (x*60)/18).apply(
                             lambda x: transform_min(x,if_manhattan=True))
 
-
+    display_data['Distance Approx'] = display_data['Distance Approx'].apply(
+                        lambda x: transform_km(x, if_m=False))
 
 # While Routing is enabled, the following lines will calculate the actual distance / duration by mode of transportation:
 else:
-    df = distance_calculation(display_data,location,distance=radius)
-    dist_mode, dur_mode= routing_final(df,location[0],location[1],api_key, mode = mode)
+    try:
+        df = distance_calculation(display_data,location,distance=radius)
+        dist_mode, dur_mode= routing_final(df,location[0],location[1],api_key, mode = mode)
 
-    df = df_add_dist_dur(df, dist_mode, dur_mode, mode)
+        df = df_add_dist_dur(df, dist_mode, dur_mode, mode)
 
-    display_data = df_transform_dist_dur(df,mode).rename(
-                            columns = {f'Distance {mode}': 'Distances',
-                                       f'Duration {mode}': f'Duration ({routing_dict[mode]})'
+        display_data = df_transform_dist_dur(df,mode).rename(
+                                columns = {f'Distance {mode}': 'Distances',
+                                        f'Duration {mode}': f'Duration ({routing_dict[mode]})'
                                                                 })
+    except KeyError:
+            display_data = distance_calculation(display_data,location,distance=radius)
+            #display_data['Linear Distance'] = display_data['Linear Distance'].apply(lambda x: transform_km(x, True))
 
+            distance = round(manhattan_distance_vectorized(location[0],location[1],display_data.Latitude, display_data.Longitude)/1000,2)
+
+            #customize
+
+            display_data['Distance Approx'] = distance
+            #st.write(display_data)
+
+            display_data['Walking time'] = display_data['Distance Approx'].apply(
+                                    lambda x: (x*60)/time_min_km).apply(
+                                    lambda x: transform_min(x,if_manhattan=True))
+
+            display_data['Biking time'] = display_data['Distance Approx'].apply(
+                                    lambda x: (x*60)/13).apply(
+                                    lambda x: transform_min(x,if_manhattan=True))
+
+            display_data['Car travel time'] = display_data['Distance Approx'].apply(
+                                    lambda x: (x*60)/18).apply(
+                                    lambda x: transform_min(x,if_manhattan=True))
+
+            display_data['Distance Approx'] = display_data['Distance Approx'].apply(
+                                lambda x: transform_km(x, if_m=False))
 
 ##############################################################################
 ################### Displaying Data  #########################################
@@ -244,11 +282,17 @@ icon_dict = {'Shopping': 'shopping-bag',
              'Transport': 'bycicle',
              'Tourism': 'hotel',
              'Sports': 'heart',
+             'suburban': 'subway' ,
+             'tram' : 'subway' ,
+             'ferry': 'ship',
+             'public': 'bus',
+             'express': 'train' ,
+             'regional': 'train',
             }
 
 
 # Initilaizing our map (with isochrones disabled)
-if checker_iso == False:
+if checker_iso == False and checker_pt == False:
     map = folium.Map(location = location,
                 zoom_start=14,
                 control_scale=True,
@@ -260,9 +304,19 @@ if checker_iso == False:
 
 
 # Initilaizing our map (with isochrones enabled)
-else:
+elif checker_iso == True and checker_pt == False:
     map = folium.Map(location = location,
                 zoom_start=iso_dict[mode],
+                control_scale=True,
+                width=width,
+                height = height)
+
+    minimap = plugins.MiniMap()
+    map.add_child(minimap)
+
+elif checker_iso == False and checker_pt == True:
+    map = folium.Map(location = location,
+                zoom_start=15,
                 control_scale=True,
                 width=width,
                 height = height)
@@ -273,7 +327,7 @@ else:
 
 checker_heatmap = st.sidebar.checkbox('Display Heatmap')
 
-if checker_heatmap == False:
+if checker_heatmap == False and checker_pt == False:
     # Loop to get all the datapoints of the final dataframe into the Popups (using Approx Distance / Duration):
 
     for i in range(len(display_data)):
@@ -300,7 +354,7 @@ if checker_heatmap == False:
                 </tr>
                 <tr>
                     <th> Distance </th>
-                    <td>{display_data['Distance Approx'][i]} km</td>
+                    <td>{display_data['Distance Approx'][i]}</td>
                 </tr>
                 <tr>
                     <th> Walking Time </th>
@@ -335,7 +389,7 @@ if checker_heatmap == False:
                 </tr>
                 <tr>
                     <th> Distance </th>
-                    <td>{display_data['Distances'][i]} km</td>
+                    <td>{display_data['Distances'][i]}</td>
                 </tr>
                 <tr>
                     <th> Duration ({routing_dict[mode]}) </th>
@@ -374,7 +428,19 @@ if checker_heatmap == False:
                     ''',width=200, height=100),
                     icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
 
-else:
+
+    folium.Circle(
+    location=location,
+    radius=radius, #hardcoded for now
+    popup=f"{radius}m Radius", #hardcoded for now
+    color="#696969",
+    fill=True,
+    fill_color="#696969",
+    ).add_to(map)
+
+    st_folium.folium_static(map, width = width, height = height)
+
+elif checker_heatmap == True and checker_pt == False:
 
     display_map = heat_map(display_data, location)
     folium.Marker([location[0],location[1]],
@@ -409,25 +475,61 @@ else:
     st_folium.folium_static(display_map, width = width, height = height)
 
 
+elif checker_heatmap == False and checker_pt == True:
+    for i in range(len(public_transport)):
+        html = f'''
+        {html_style}
+        <p style="font-family: Arial">
+        <table>
+            <tr>
+                <th>Name</th>
+                <td> {public_transport['Name'][i]} </td>
+            </tr>
+            <tr>
+                <th>Distance</th>
+                <td> {public_transport['Distance'][i]/1000} </td>
+            </tr>
+            <tr>
+                <th>Adress</th>
+                <td>{public_transport['Modes of Transportation'][i]}</td>
+            </tr>
+        </table>
+        </table>
+        </p>'''
 
-# Creating the radius of your analsys (adjustable to only display items within entered radius)
-if checker_iso == False:
-    folium.Circle(
-    location=location,
-    radius=radius, #hardcoded for now
-    popup=f"{radius}m Radius", #hardcoded for now
-    color="#696969",
-    fill=True,
-    fill_color="#696969",
-    ).add_to(map)
+    # Block of the for loop, to get all the datapoints displayed as markers in the map:
 
+        folium.Marker([public_transport.lat[i],
+                    public_transport.lon[i]],
+                    popup = folium.Popup(folium.IFrame(html=html, width=500, height=200), max_width=2000, max_height=500),
+                    icon = folium.Icon(color = 'green',
+                                        icon = icon_dict['public'],
+                                        prefix='fa')).add_to(map)
+
+
+    # Marker, to display your current location (/entered adress):
+    folium.Marker([location[0],location[1]],
+                    popup = folium.Popup(html=f'''{html_style}
+                    <p style="font-family: Arial">
+                    <table>
+                        <tr>
+                            <th>You</th>
+                        </tr>
+                        <tr>
+                            <th>Current Location:</th>
+                            <td>{address}</td>
+                        </tr>
+                    </table>
+                    </p>
+                    ''',width=200, height=100),
+                    icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
+
+
+    st_folium.folium_static(map, width = width, height = height)
 # Format of the Long and Lat (see function below)
 fmtr = "function(num) {return L.Util.formatNum(num, 3);};"
 
 # Displays the mouse positions lon / lat (see top right corner of the map)
-loc = plugins.MousePosition(position='topright', separator=' , ',numDigits = 6,
-                            lat_formatter=fmtr, lng_formatter=fmtr).add_to(map)
-
 
 
 # Displays Isochrones (how far do i get in 15/10/5 mins)
@@ -442,16 +544,7 @@ if checker_iso == True:
 else:
     pass
 
-#Displaying the map:
-st_folium.folium_static(map, width = width, height = height)
 
-#def color_coding(df):
-#    return ['background-color:red'] * len(
-#        df) if df.Longitude == loc
-#
-#    if loc == (display_data.Longitude , display_data.Latitude):
-#        return ['background-color:green']
-#    else: pass
 
 ##############################################################################
 ################### Displaying Dataframes and Download Option  ###############
@@ -462,29 +555,31 @@ display_data['Linear Distance'] = display_data['Linear Distance'].apply(
                             lambda x: transform_km(x, if_m=True))
 
 
-display_data['Distance Approx'] = display_data['Distance Approx'].apply(
-                            lambda x: transform_km(x, if_m=False))
-
-# Display dataframe with the distance and duration calculations
-st.subheader('Table 1: Subclass selection including distance and travel time estimates')
-st.markdown('The table shows the data as queried. If routing is not ticked, estimates are provided based on average speeds for the three modes of transport')
-st.dataframe(display_data, width = width_df)
+if checker_pt == True:
+    st.dataframe(display_tansport)
 
 
-# Download Button for the first DF
-@st.experimental_memo
-def convert_df(df):
-   return df.to_csv(index=False).encode('utf-8')
+else:
+    # Display dataframe with the distance and duration calculations
+    st.subheader('Table 1: Subclass selection including distance and travel time estimates')
+    st.markdown('The table shows the data as queried. If routing is not ticked, estimates are provided based on average speeds for the three modes of transport')
+    st.dataframe(display_data, width = width_df)
 
-csv_routing = convert_df(display_data)
 
-st.download_button(
-   "Press to Download",
-   csv_routing,
-   "travel_time_query.csv",
-   "text/csv",
-   key='download-csv-routing'
-)
+    # Download Button for the first DF
+    @st.experimental_memo
+    def convert_df(df):
+        return df.to_csv(index=False).encode('utf-8')
+
+    csv_routing = convert_df(display_data)
+
+    st.download_button(
+    "Press to Download",
+    csv_routing,
+    "travel_time_query.csv",
+    "text/csv",
+    key='download-csv-routing'
+    )
 
 checker_semi = st.sidebar.checkbox('Semi Processed Location Data')
 if checker_semi == True:
