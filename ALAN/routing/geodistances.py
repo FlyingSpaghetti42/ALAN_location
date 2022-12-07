@@ -2,7 +2,6 @@ import requests
 #from geopy.distance import geodesic
 import time
 import requests
-import numpy as np
 
 api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
 
@@ -209,7 +208,6 @@ def routing_final(df,
         dur_mode.append(request[1])
     return dist_mode, dur_mode
 
-#def get_beeline(df,location)
 
 def get_isochrone(mode:str,
                   locations, # at centre of isochrone (e.g.[[13.38895,52.515115]])

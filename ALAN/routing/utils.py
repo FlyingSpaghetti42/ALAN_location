@@ -25,8 +25,8 @@ def transform_min(float_min, if_manhattan=False):
 
 def speed(walker_speed):
     if walker_speed == 'fast':
-        return (7000)
+        return (7)
     elif walker_speed == 'medium':
-        return (4000)
+        return (4)
     elif walker_speed == 'slow':
-        return (3000)
+        return (3)
