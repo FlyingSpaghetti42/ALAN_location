@@ -202,6 +202,10 @@ if checker == False:
                             lambda x: (x*60)/18).apply(
                             lambda x: transform_min(x,if_manhattan=True))
 
+    
+    
+    display_data['Distance Approx'] = display_data['Distance Approx'].apply(
+                            lambda x: transform_km(x, if_m=False))
 
 
 # While Routing is enabled, the following lines will calculate the actual distance / duration by mode of transportation:
@@ -215,10 +219,6 @@ else:
                             columns = {f'Distance {mode}': 'Distances',
                                        f'Duration {mode}': f'Duration ({routing_dict[mode]})'
                                                                 })
-    
-    
-    display_data['Distance Approx'] = display_data['Distance Approx'].apply(
-                            lambda x: transform_km(x, if_m=False))
 
 
 ##############################################################################
