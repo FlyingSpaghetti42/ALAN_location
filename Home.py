@@ -5,7 +5,6 @@ from folium import plugins
 import streamlit_folium as st_folium
 from decimal import Decimal
 
-
 from ALAN.data.data_engineering import get_location, distance_calculation, raw_data, data_cleaning, filter_columns,format_subclass_transport
 from ALAN.data.dash_board_basic import important_features, heat_map
 from ALAN.data.colors import colors
@@ -14,7 +13,8 @@ from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_du
 from ALAN.routing.geodistances import routing_final, get_isochrone
 from ALAN.routing.utils import speed, transform_km, transform_min
 
-api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
+api_key = os.environ.get('API_KEY')
+
 
 ##############################################################################
 ######### Website Layout #####################################################
