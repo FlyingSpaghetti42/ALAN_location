@@ -215,6 +215,10 @@ else:
                             columns = {f'Distance {mode}': 'Distances',
                                        f'Duration {mode}': f'Duration ({routing_dict[mode]})'
                                                                 })
+    
+    
+    display_data['Distance Approx'] = display_data['Distance Approx'].apply(
+                            lambda x: transform_km(x, if_m=False))
 
 
 ##############################################################################
@@ -462,8 +466,6 @@ display_data['Linear Distance'] = display_data['Linear Distance'].apply(
                             lambda x: transform_km(x, if_m=True))
 
 
-display_data['Distance Approx'] = display_data['Distance Approx'].apply(
-                            lambda x: transform_km(x, if_m=False))
 
 # Display dataframe with the distance and duration calculations
 st.subheader('Table 1: Subclass selection including distance and travel time estimates')
