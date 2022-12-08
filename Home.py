@@ -48,7 +48,7 @@ st.markdown('___')
 # Checkboxes on the sidebar:
 
 # Displays informations regarding each step:
-checker_help = st.sidebar.checkbox('How to use this app?')
+checker_help = st.sidebar.checkbox('How to use this App?')
 
 
 
@@ -67,7 +67,7 @@ time_min_km = speed('medium')
 
 # Street Input:
 if checker_help == True:
-    st.markdown('1. Enter the adress of the Location you want to analyze')
+    st.markdown('1. Enter the address of the Location you want to analyze')
 
 
 address = st.text_input('Adress', 'Rudi Dutschke Straße 26', placeholder='Enter Text here')
@@ -98,12 +98,12 @@ else:
 # Preference Input (displayed, once you entered a valid adress)
 if address  != 'Please enter Adress':
     if checker_help == True:
-        st.markdown('2. Please choose the types of Amneties, you want to include in your analysis')
+        st.markdown('2. Please choose the types of Classes you want to include in your analysis')
     preferences = st.selectbox('**Classes**', options = ('Shopping', 'Office',
                                                     'Transport','Tourism',
                                                     'Amenity', 'Sports'))
     if checker_help == True:
-        st.markdown('3. Please choose the subclasses, you want to include in your analysis (You can choose up to 5 different subclasses')
+        st.markdown('3. Please choose the subclasses you want to include in your analysis (You can choose up to 5 different subclasses')
 
 
 # DataFrame that only displays data from the choosen Class:
@@ -143,12 +143,12 @@ checker_iso = st.sidebar.checkbox('Isochrone',)
 # Option to use the built-in routing function:
 checker = st.sidebar.checkbox('Routing')
 if checker == True:
-    api_key = st.text_input('In order to use the Routing Service, please enter a Open Route Service API key')
+    api_key = st.text_input('In order to use the Routing Service, please enter an Open Route Service API key')
 
 
 # Choose the mode for the routing option (only available with routing enabled)
 if checker == True or checker_iso == True:
-    mode = st.selectbox('**Transportation Mode**n', options = ("bikeing",
+    mode = st.selectbox('**Transportation Mode**n', options = ("biking",
                                                        "walking",
                                                        "driving"))
 
@@ -177,7 +177,7 @@ subclass_check = list(subcolumn)
 color = colors(subclass_check)
 
 # Dict used to Display different Names, per Routing mode, in Map.
-routing_dict = {"bikeing": 'Bike',
+routing_dict = {"biking": 'Bike',
                 "walking": 'Foot',
                 "driving": 'Car'
                 }
@@ -262,7 +262,7 @@ else:
 
 # Helpers: Displaying the Data:
 # Dict to define the zoom of the  map (while using the isochrones feature)
-iso_dict = {'bikeing': 13,
+iso_dict = {'biking': 13,
             'walking':15,
             'driving':12
             }

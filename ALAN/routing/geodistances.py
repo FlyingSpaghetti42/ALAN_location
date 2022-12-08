@@ -44,7 +44,7 @@ def routing(mode:str,
     '''
     # specify mode and base-url
     modes_dict = {
-        'bikeing': 'cycling-regular',
+        'biking': 'cycling-regular',
         'walking': 'foot-walking',
         'driving': 'driving-car'
     }
@@ -238,7 +238,7 @@ def get_isochrone(mode:str,
     attributes: also passes some population information for the isochrones
     '''
     modes_dict = {
-        'bikeing': 'cycling-regular',
+        'biking': 'cycling-regular',
         'walking': 'foot-walking',
         'driving': 'driving-car'
     }
