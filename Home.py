@@ -14,7 +14,7 @@ from ALAN.routing.dataframe_builder import df_add_dist_dur, df_transform_dist_du
 from ALAN.routing.geodistances import routing_final, get_isochrone
 from ALAN.routing.utils import speed, transform_km, transform_min
 
-api_key = '5b3ce3597851110001cf62482818c293528942238de6f690d9ec3b11'
+api_key = '5b3ce3597851110001cf6248f3265acccea64a2cbc94701747f1410f'
 
 ##############################################################################
 ######### Website Layout #####################################################
@@ -299,9 +299,6 @@ if checker_iso == False and checker_pt == False:
                 width=width,
                 height = height)
 
-    minimap = plugins.MiniMap()
-    map.add_child(minimap)
-
 
 # Initilaizing our map (with isochrones enabled)
 elif checker_iso == True and checker_pt == False:
@@ -311,8 +308,6 @@ elif checker_iso == True and checker_pt == False:
                 width=width,
                 height = height)
 
-    minimap = plugins.MiniMap()
-    map.add_child(minimap)
 
 elif checker_iso == False and checker_pt == True:
     map = folium.Map(location = location,
@@ -321,8 +316,7 @@ elif checker_iso == False and checker_pt == True:
                 width=width,
                 height = height)
 
-    minimap = plugins.MiniMap()
-    map.add_child(minimap)
+
 
 
 checker_heatmap = st.sidebar.checkbox('Display Heatmap')
@@ -429,20 +423,24 @@ if checker_heatmap == False and checker_pt == False:
                     icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
 
 
-    folium.Circle(
-    location=location,
-    radius=radius, #hardcoded for now
-    popup=f"{radius}m Radius", #hardcoded for now
-    color="#696969",
-    fill=True,
-    fill_color="#696969",
-    ).add_to(map)
 
-    st_folium.folium_static(map, width = width, height = height)
+    if checker_iso == False:
+        folium.Circle(
+        location=location,
+        radius=radius, #hardcoded for now
+        popup=f"{radius}m Radius", #hardcoded for now
+        color="#696969",
+        fill=True,
+        fill_color="#696969",
+        ).add_to(map)
+    else:
+        pass
+
+
 
 elif checker_heatmap == True and checker_pt == False:
 
-    display_map = heat_map(display_data, location)
+    map = heat_map(display_data, location)
     folium.Marker([location[0],location[1]],
                     popup = folium.Popup(html=f'''{html_style}
                     <p style="font-family: Arial">
@@ -457,7 +455,7 @@ elif checker_heatmap == True and checker_pt == False:
                     </table>
                     </p>
                     ''',width=200, height=100),
-                    icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(display_map)
+                    icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
 
 
     folium.Circle(
@@ -467,12 +465,11 @@ elif checker_heatmap == True and checker_pt == False:
     color="#696969",
     fill=True,
     fill_color="#696969",
-    ).add_to(display_map)
+    ).add_to(map)
 
 
 
     #st.map(display_map)
-    st_folium.folium_static(display_map, width = width, height = height)
 
 
 elif checker_heatmap == False and checker_pt == True:
@@ -525,7 +522,6 @@ elif checker_heatmap == False and checker_pt == True:
                     icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
 
 
-    st_folium.folium_static(map, width = width, height = height)
 # Format of the Long and Lat (see function below)
 fmtr = "function(num) {return L.Util.formatNum(num, 3);};"
 
@@ -544,7 +540,7 @@ if checker_iso == True:
 else:
     pass
 
-
+st_folium.folium_static(map, width = width, height = height)
 
 ##############################################################################
 ################### Displaying Dataframes and Download Option  ###############
@@ -568,6 +564,7 @@ else:
 
     # Download Button for the first DF
     @st.experimental_memo
+
     def convert_df(df):
         return df.to_csv(index=False).encode('utf-8')
 
