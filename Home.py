@@ -70,16 +70,16 @@ if checker_help == True:
     st.markdown('1. Enter the address of the Location you want to analyze')
 
 
-address = st.text_input('Adress', 'Rudi Dutschke Straße 26', placeholder='Enter Text here')
+address = st.text_input('Address', 'Rudi Dutschke Straße 26', placeholder='Enter Text here')
 
 checker_pt = st.sidebar.checkbox('Nearest Public Transport')
 
-# Function that gets the lat and lon of the Adress used
+# Function that gets the lat and lon of the address used
 location=get_location(address)
 
 
 #This function defines the data to be used:
-if address  != 'Please enter Adress':
+if address  != 'Please enter address':
     @st.cache()
     def get_dataframe(address, radius=2000):
         return data_cleaning(address, radius=radius)
@@ -87,7 +87,7 @@ if address  != 'Please enter Adress':
 
     data_copy = data.copy()
 
-elif address  == 'Please enter Adress':
+elif address  == 'Please enter address':
     pass
 
 else:
@@ -95,8 +95,8 @@ else:
 
 
 
-# Preference Input (displayed, once you entered a valid adress)
-if address  != 'Please enter Adress':
+# Preference Input (displayed, once you entered a valid address)
+if address  != 'Please enter address':
     if checker_help == True:
         st.markdown('2. Please choose the types of Classes you want to include in your analysis')
     preferences = st.selectbox('**Classes**', options = ('Shopping', 'Office',
@@ -107,7 +107,7 @@ if address  != 'Please enter Adress':
 
 
 # DataFrame that only displays data from the choosen Class:
-if address  != 'Please enter Adress':
+if address  != 'Please enter address':
     @st.cache()
     def select_class(df,preferences):
         if preferences == 'Transport':
@@ -148,8 +148,8 @@ if checker == True:
 
 # Choose the mode for the routing option (only available with routing enabled)
 if checker == True or checker_iso == True:
-    mode = st.selectbox('**Transportation Mode**n', options = ("biking",
-                                                       "walking",
+    mode = st.selectbox('**Transportation Mode**n', options = ("walking",
+                                                       "biking",
                                                        "driving"))
 
 
@@ -278,18 +278,18 @@ html_style = '''
             '''
 
 # Dict to define the Icons, that will be displayed per Class.
-icon_dict = {'Shopping': 'shopping-bag',
-             'Office': 'archive',
-             'Transport': 'bycicle',
-             'Tourism': 'hotel',
-             'Sports': 'heart',
-             'suburban': 'subway' ,
-             'tram' : 'subway' ,
-             'ferry': 'ship',
-             'public': 'bus',
-             'express': 'train' ,
-             'regional': 'train',
-            }
+#icon_dict = {'Shopping': 'shopping-bag',
+#            'Office': 'archive',
+#            'Transport': 'bycicle',
+#            'Tourism': 'hotel',
+#            'Sports': 'heart',
+#            'suburban': 'subway' ,
+#            'tram' : 'subway' ,
+#            'ferry': 'ship',
+#            'public': 'bus',
+#            'express': 'train' ,
+#            'regional': 'train',
+#           }
 
 
 # Initilaizing our map (with isochrones disabled)
@@ -340,7 +340,7 @@ if checker_heatmap == False and checker_pt == False:
                     <td> {display_data['Location Name'][i]} </td>
                 </tr>
                 <tr>
-                    <th>Adress</th>
+                    <th>address</th>
                     <td>{display_data['Address'][i]}</td>
                 </tr>
                     <tr>
@@ -370,7 +370,7 @@ if checker_heatmap == False and checker_pt == False:
                     <td> {display_data['Location Name'][i]} </td>
                 </tr>
                 <tr>
-                    <th>Adress</th>
+                    <th>address</th>
                     <td>{display_data['Address'][i]}</td>
                 </tr>
                 </tr>
@@ -402,11 +402,11 @@ if checker_heatmap == False and checker_pt == False:
                     display_data.Longitude[i]],
                     popup = folium.Popup(folium.IFrame(html=html, width=500, height=200), max_width=2000, max_height=500),
                     icon = folium.Icon(color = color[display_data[preferences][i]],
-                                        icon = icon_dict[preferences],
+                                        icon = '',
                                         prefix='fa')).add_to(map)
 
 
-    # Marker, to display your current location (/entered adress):
+    # Marker, to display your current location (/entered address):
     folium.Marker([location[0],location[1]],
                     popup = folium.Popup(html=f'''{html_style}
                     <p style="font-family: Arial">
@@ -421,7 +421,7 @@ if checker_heatmap == False and checker_pt == False:
                     </table>
                     </p>
                     ''',width=200, height=100),
-                    icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
+                    icon = folium.Icon(color='orange', icon='user', prefix = 'fa')).add_to(map)
 
 
 
@@ -459,15 +459,17 @@ elif checker_heatmap == True and checker_pt == False:
                     icon = folium.Icon(color='blue', icon='user', prefix = 'fa')).add_to(map)
 
 
-    folium.Circle(
-    location=location,
-    radius=radius, #hardcoded for now
-    popup=f"{radius}m Radius", #hardcoded for now
-    color="#696969",
-    fill=True,
-    fill_color="#696969",
-    ).add_to(map)
-
+    if checker_iso == False:
+        folium.Circle(
+        location=location,
+        radius=radius, #hardcoded for now
+        popup=f"{radius}m Radius", #hardcoded for now
+        color="#696969",
+        fill=True,
+        fill_color="#696969",
+        ).add_to(map)
+    else:
+        pass
 
 
     #st.map(display_map)
@@ -488,7 +490,7 @@ elif checker_heatmap == False and checker_pt == True:
                 <td> {public_transport['Distance'][i]/1000} </td>
             </tr>
             <tr>
-                <th>Adress</th>
+                <th>address</th>
                 <td>{public_transport['Modes of Transportation'][i]}</td>
             </tr>
         </table>
@@ -501,11 +503,11 @@ elif checker_heatmap == False and checker_pt == True:
                     public_transport.lon[i]],
                     popup = folium.Popup(folium.IFrame(html=html, width=500, height=200), max_width=2000, max_height=500),
                     icon = folium.Icon(color = 'green',
-                                        icon = icon_dict['public'],
+                                        icon = '',
                                         prefix='fa')).add_to(map)
 
 
-    # Marker, to display your current location (/entered adress):
+    # Marker, to display your current location (/entered address):
     folium.Marker([location[0],location[1]],
                     popup = folium.Popup(html=f'''{html_style}
                     <p style="font-family: Arial">
@@ -619,7 +621,7 @@ if checker_im_ft == True:
 
     if type(data) != str:
         st.subheader('The following table displays the number of selected features available in the queried area')
-        st.dataframe(data,width=1000)
+        st.dataframe(data,width=width_df)
     else:
         st.write(data)
 
